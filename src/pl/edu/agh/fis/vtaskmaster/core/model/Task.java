@@ -1,15 +1,13 @@
 package pl.edu.agh.fis.vtaskmaster.core.model;
 
-/**
- * Created by Grzegorz on 25.04.2016.
- */
+
 public class Task {
     private int id;
     private String name;
     private String description;
     private int priority;
-    boolean favourite;
-    boolean todo;
+    private boolean favourite;
+    private boolean todo;
 
     public int getId() {
         return id;

@@ -6,9 +6,7 @@ import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 import java.sql.*;
 import java.util.ArrayList;
 
-/**
- * Created by Grzegorz on 25.04.2016.
- */
+
 public class CoreDB {
     // sqlite driver for JDBC
     public static final String DRIVER = "org.sqlite.JDBC";
@@ -173,10 +171,10 @@ public class CoreDB {
 
     public static void main(String[] args) {
         CoreDB db = new CoreDB();
-        db.addTask("elo", "melo", 1, true, false);
-        db.addTask("elo", "melo", 1, true, false);
+        //db.addTask("elo", "melo", 1, true, false);
+        //db.addTask("gelo", "melo", 1, true, false);
 
-        System.out.println(db.getTaskByName("melo"));
+        System.out.println(db.getTaskByName("elo"));
     }
 
 }

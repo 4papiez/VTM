@@ -1,8 +1,6 @@
 package pl.edu.agh.fis.vtaskmaster.core.model;
 
-/**
- * Created by Grzegorz on 25.04.2016.
- */
+
 public class ExecutedTask {
     private int taskId;
     private long startTime;
