@@ -47,6 +47,7 @@ public class CoreDB {
                 "name           varchar(45)     NOT NULL, " +
                 "description    TEXT, " +
                 "priority       SMALLINT        NOT NULL, " +
+                "expectedTime   INTEGER         NOT NULL, " +
                 "favourite      BOOLEAN         DEFAULT FALSE, " +
                 "todo           BOOLEAN         DEFAULT TRUE, " +
                 "UNIQUE(name) ON CONFLICT ABORT)";
@@ -71,17 +72,18 @@ public class CoreDB {
         return true;
     }
 
-    public boolean addTask(String name, String description, int priority,
+    public boolean addTask(String name, String description, int priority, long expectedTime,
                            boolean favourite, boolean todo) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO tasks VALUES (NULL, ?, ?, ?, ?, ?)"
+                    "INSERT INTO tasks VALUES (NULL, ?, ?, ?, ?, ?, ?)"
             );
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, description);
             preparedStatement.setInt(3, priority);
-            preparedStatement.setBoolean(4, favourite);
-            preparedStatement.setBoolean(5, todo);
+            preparedStatement.setLong(4, expectedTime);
+            preparedStatement.setBoolean(5, favourite);
+            preparedStatement.setBoolean(6, todo);
             preparedStatement.execute();
         }
         catch (SQLException e) {
@@ -92,15 +94,17 @@ public class CoreDB {
         return true;
     }
 
-    public boolean addExecutedTask(int taskId, long startTime, long endTime, long totalDuration) {
+    public boolean addExecutedTask(int taskId, long startTime, long endTime,
+                                   long totalDuration, boolean done) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?)"
+                    "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
             );
             preparedStatement.setInt(1, taskId);
             preparedStatement.setLong(2, startTime);
             preparedStatement.setLong(3, endTime);
             preparedStatement.setLong(4, totalDuration);
+            preparedStatement.setBoolean(5, done);
         }
         catch (SQLException e) {
             System.err.println("Błąd przy dodawaniu wykonanego zadania");
@@ -117,16 +121,18 @@ public class CoreDB {
             int id, priority;
             boolean favourite, todo;
             String name, description;
+            long expectedTime;
             while(result.next()) {
                 id = result.getInt("id");
                 name = result.getString("name");
                 description = result.getString("description");
                 priority = result.getInt("priority");
+                expectedTime = result.getLong("expectedTime");
                 favourite = result.getBoolean("favourite");
                 todo = result.getBoolean("todo");
 
                 allTasks.add(
-                        new Task(id, name, description, priority, favourite, todo)
+                        new Task(id, name, description, priority, expectedTime, favourite, todo)
                 );
             }
         }
@@ -141,6 +147,7 @@ public class CoreDB {
         int id, priority;
         boolean favourite, todo;
         String description;
+        long expectedTime;
         Task task = null;
         try {
             ResultSet result = statement.executeQuery("SELECT * FROM tasks WHERE name='"
@@ -150,10 +157,11 @@ public class CoreDB {
                 id = result.getInt("id");
                 priority = result.getInt("priority");
                 description = result.getString("description");
+                expectedTime = result.getLong("expectedTime");
                 favourite = result.getBoolean("favourite");
                 todo = result.getBoolean("todo");
 
-                task = new Task(id, name, description, priority, favourite, todo);
+                task = new Task(id, name, description, priority, expectedTime, favourite, todo);
             }
             else
             {
@@ -171,7 +179,7 @@ public class CoreDB {
 
     public static void main(String[] args) {
         CoreDB db = new CoreDB();
-        //db.addTask("elo", "melo", 1, true, false);
+        db.addTask("elo", "melo", 1, 500, true, false);
         //db.addTask("gelo", "melo", 1, true, false);
 
         System.out.println(db.getTaskByName("elo"));

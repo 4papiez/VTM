@@ -6,8 +6,17 @@ public class Task {
     private String name;
     private String description;
     private int priority;
+    private long expectedTime;
     private boolean favourite;
     private boolean todo;
+
+    public long getExpectedTime() {
+        return expectedTime;
+    }
+
+    public void setExpectedTime(long expectedTime) {
+        this.expectedTime = expectedTime;
+    }
 
     public int getId() {
         return id;
@@ -57,11 +66,12 @@ public class Task {
         this.todo = todo;
     }
 
-    public Task(int id, String name, String description, int priority, boolean favourite, boolean todo) {
+    public Task(int id, String name, String description, int priority, long expectedTime, boolean favourite, boolean todo) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.priority = priority;
+        this.expectedTime = expectedTime;
         this.favourite = favourite;
         this.todo = todo;
     }
@@ -73,6 +83,7 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", priority=" + priority +
+                ", expected time=" + expectedTime +
                 ", favourite=" + favourite +
                 ", todo=" + todo +
                 '}';

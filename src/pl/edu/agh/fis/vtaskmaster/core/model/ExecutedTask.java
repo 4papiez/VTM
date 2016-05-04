@@ -5,6 +5,7 @@ public class ExecutedTask {
     private int taskId;
     private long startTime;
     private long endDate;
+    private boolean done;
 
     public int getTaskId() {
         return taskId;
