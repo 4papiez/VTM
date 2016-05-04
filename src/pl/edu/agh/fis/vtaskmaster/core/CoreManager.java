@@ -22,7 +22,7 @@ public class CoreManager {
 
 
     /**
-     * @return ArrayList of all tasks from the DB or null if it's empty.
+     * @return ArrayList of all tasks from the DB.
      */
     public ArrayList<Task> getAllTasks() {
         ArrayList<Task> tasks;
@@ -80,6 +80,10 @@ public class CoreManager {
         return tasks;
     }
 
+    /**
+     * Gets all tasks which are marked as todo from DB.
+     * @return ArrayList of {@link pl.edu.agh.fis.vtaskmaster.core.model.Task} with a positive todo flag.
+     */
     public ArrayList<Task> getTodo() {
         ArrayList<Task> tasks;
         try {
@@ -91,6 +95,42 @@ public class CoreManager {
         return tasks;
     }
 
+    public boolean removeTaskByName(String taskName) {
+        try {
+            db.removeTaskByName(taskName);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean saveTask(Task task) {
+        try {
+            // there's already task with a given (old) name, so just update it
+            if (db.isTaskWithName(task.getOldName())) {
+                db.updateTask(task);
+            }
+            // there's no task with a given name, so add it
+            else {
+                db.addTask(task);
+            }
+        }
+        catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean executeTask(Task task, long startTime) {
+        try {
+            db.addExecutedTask(task, startTime);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
 
 
 

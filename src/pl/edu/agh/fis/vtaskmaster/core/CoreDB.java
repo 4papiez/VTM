@@ -1,6 +1,5 @@
 package pl.edu.agh.fis.vtaskmaster.core;
 
-import com.sun.javafx.tk.Toolkit;
 import org.sqlite.SQLiteConfig;
 import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
 import pl.edu.agh.fis.vtaskmaster.core.model.Task;
@@ -74,18 +73,17 @@ public class CoreDB {
         return true;
     }
 
-    public boolean addTask(String name, String description, int priority, long expectedTime,
-                           boolean favourite, boolean todo) {
+    public boolean addTask(Task task) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO tasks VALUES (?, ?, ?, ?, ?, ?)"
             );
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, description);
-            preparedStatement.setInt(3, priority);
-            preparedStatement.setLong(4, expectedTime);
-            preparedStatement.setBoolean(5, favourite);
-            preparedStatement.setBoolean(6, todo);
+            preparedStatement.setString(1, task.getName());
+            preparedStatement.setString(2, task.getDescription());
+            preparedStatement.setInt(3, task.getPriority());
+            preparedStatement.setLong(4, task.getExpectedTime());
+            preparedStatement.setBoolean(5, task.isFavourite());
+            preparedStatement.setBoolean(6, task.isTodo());
             preparedStatement.execute();
         }
         catch (SQLException e) {
@@ -96,30 +94,61 @@ public class CoreDB {
         return true;
     }
 
-    public boolean addExecutedTask(String taskName, long startTime, long endTime,
-                                   long totalDuration, boolean done) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
-            );
-            preparedStatement.setString(1, taskName);
-            preparedStatement.setLong(2, startTime);
-            preparedStatement.setLong(3, endTime);
-            preparedStatement.setLong(4, totalDuration);
-            preparedStatement.setBoolean(5, done);
-            preparedStatement.execute();
-        }
-        catch (SQLException e) {
-            System.err.println("Błąd przy dodawaniu wykonanego zadania");
-            e.printStackTrace();
-            return false;
-        }
+    public boolean removeTaskByName(String taskName) throws SQLException {
+        return statement.execute("DELETE FROM tasks WHERE name=" + taskName);
+    }
+
+    public boolean updateTask(Task task) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE tasks SET name = ?, description = ?, priority = ?, expectedTime = ?," +
+                        "favourite = ?, todo = ? WHERE name = ?"
+        );
+
+        statement.setString(1, task.getName());
+        statement.setString(2, task.getDescription());
+        statement.setInt(3, task.getPriority());
+        statement.setLong(4, task.getExpectedTime());
+        statement.setBoolean(5, task.isFavourite());
+        statement.setBoolean(6, task.isTodo());
+        statement.setString(7, task.getOldName());
+
+        statement.executeUpdate();
+        statement.close();
+        return true;
+    }
+
+    public boolean updateExecutedTask(ExecutedTask task) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE executedTasks SET duration = ? " +
+                        "WHERE id = ?"
+        );
+
+
+        statement.setLong(1, task.getElapsedTime());
+        statement.setInt(2, task.getId());
+
+        statement.executeUpdate();
+        statement.close();
+        return true;
+    }
+
+    public boolean addExecutedTask(Task task, long startTime) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
+        );
+        preparedStatement.setString(1, task.getName());
+        preparedStatement.setLong(2, startTime);
+        preparedStatement.setLong(3, 0);
+        preparedStatement.setLong(4, 0);
+        preparedStatement.setBoolean(5, false);
+        preparedStatement.execute();
+
         return true;
     }
 
 
 
-    public ArrayList<Task> getTasksWithCondition(String condition) throws SQLException {
+    private ArrayList<Task> getTasksWithCondition(String condition) throws SQLException {
         ArrayList<Task> tasks = new ArrayList<>();
         ResultSet result = statement.executeQuery("SELECT * FROM tasks " + condition);
         int priority;
@@ -180,6 +209,11 @@ public class CoreDB {
         return task;
     }
 
+    public boolean isTaskWithName(String taskName) throws SQLException {
+        ResultSet result = statement.executeQuery("SELECT 1 FROM tasks WHERE name=" + taskName);
+        return result.getFetchSize() == 1;
+    }
+
     public ArrayList<ExecutedTask> getAllExecutedTasks() throws SQLException {
         ArrayList<ExecutedTask> allTasks = new ArrayList<>();
 
@@ -197,7 +231,7 @@ public class CoreDB {
             elapsedTime = result.getLong("duration");
 
             allTasks.add(
-                    new ExecutedTask(taskName, startTime, endTime, elapsedTime, done)
+                    new ExecutedTask(id, taskName, startTime, endTime, elapsedTime, done)
             );
         }
 
@@ -220,6 +254,25 @@ public class CoreDB {
         //db.addTask("sprzedac koniaszka", "wazne bardzo zadanie", 1, 500, false, false);
         try {
             db.getAllTasks().forEach(System.out::println);
+            System.out.println("_______");
+
+            Task myTask = db.getTaskByName("kupic chleb");
+            if (myTask != null) {
+                myTask.setName("zmienic bieg");
+                myTask.setDescription("szybko i sprawnie");
+                db.updateTask(myTask);
+            }
+            db.getAllTasks().forEach(System.out::println);
+
+            db.getAllExecutedTasks().forEach(System.out::println);
+            ExecutedTask myExecutedTask = db.getAllExecutedTasks().get(0);
+            if (myExecutedTask != null) {
+                myExecutedTask.setElapsedTime(600);
+                db.updateExecutedTask(myExecutedTask);
+            }
+            db.getAllExecutedTasks().forEach(System.out::println);
+
+
         }
         catch (SQLException e) {
 

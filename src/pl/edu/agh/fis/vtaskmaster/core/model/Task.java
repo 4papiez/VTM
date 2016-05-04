@@ -10,6 +10,9 @@ public class Task {
     private boolean favourite;
     private boolean todo;
 
+    public String getOldName() {
+        return oldName;
+    }
     public long getExpectedTime() {
         return expectedTime;
     }

@@ -2,11 +2,16 @@ package pl.edu.agh.fis.vtaskmaster.core.model;
 
 
 public class ExecutedTask {
+    private int id;
     private String taskName;
     private long startTime;
     private long endTime;
     private long elapsedTime;
     private boolean done;
+
+    public int getId() {
+        return id;
+    }
 
     public String getTaskName() {
         return taskName;
@@ -40,8 +45,9 @@ public class ExecutedTask {
         this.endTime = endTime;
     }
 
-    public ExecutedTask(String taskName, long startTime, long endTime,
+    public ExecutedTask(int id, String taskName, long startTime, long endTime,
                         long elapsedTime, boolean done) {
+        this.id = id;
         this.taskName = taskName;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -52,7 +58,8 @@ public class ExecutedTask {
     @Override
     public String toString() {
         return "ExecutedTask{" +
-                "taskName=" + taskName +
+                "id = " + id +
+                ", taskName=" + taskName +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", elapsedTime=" + elapsedTime +
