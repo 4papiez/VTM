@@ -1,6 +1,7 @@
 package pl.edu.agh.fis.vtaskmaster.core;
 
 import org.sqlite.SQLiteConfig;
+import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
 import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 
 import java.sql.*;
@@ -47,7 +48,7 @@ public class CoreDB {
                 "name           varchar(45)     NOT NULL, " +
                 "description    TEXT, " +
                 "priority       SMALLINT        NOT NULL, " +
-                "expectedTime   INTEGER         NOT NULL, " +
+                "expectedTime   BIGINT         NOT NULL, " +
                 "favourite      BOOLEAN         DEFAULT FALSE, " +
                 "todo           BOOLEAN         DEFAULT TRUE, " +
                 "UNIQUE(name) ON CONFLICT ABORT)";
@@ -58,6 +59,7 @@ public class CoreDB {
                 "startTime      BIGINT          NOT NULL, " +
                 "endTime        BIGINT          NOT NULL, " +
                 "duration       BIGINT          NOT NULL, " +
+                "done           BOOLEAN         NOT NULL, " +
                 "FOREIGN KEY(task_id)           REFERENCES tasks(id))";
 
         try {
@@ -105,6 +107,7 @@ public class CoreDB {
             preparedStatement.setLong(3, endTime);
             preparedStatement.setLong(4, totalDuration);
             preparedStatement.setBoolean(5, done);
+            preparedStatement.execute();
         }
         catch (SQLException e) {
             System.err.println("Błąd przy dodawaniu wykonanego zadania");
@@ -176,13 +179,52 @@ public class CoreDB {
         return task;
     }
 
+    public ArrayList<ExecutedTask> getAllExecutedTasks() {
+        ArrayList<ExecutedTask> allTasks = new ArrayList<>();
+        try {
+            ResultSet result = statement.executeQuery("SELECT * FROM executedTasks");
+            int id, taskId;
+            boolean done;
+            long startTime, endTime, elapsedTime;
+            while(result.next()) {
+                id = result.getInt("id");
+                taskId = result.getInt("task_id");
+                done = result.getBoolean("done");
+                startTime = result.getLong("startTime");
+                endTime = result.getLong("endTime");
+                elapsedTime = result.getLong("duration");
+
+                allTasks.add(
+                        new ExecutedTask(taskId, startTime, endTime, elapsedTime, done)
+                );
+            }
+        }
+        catch (SQLException e) {
+            System.err.println("Błąd przy odczycie wykonanych zadań");
+            e.printStackTrace();
+        }
+        return allTasks;
+    }
+
+    public void closeConnection() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            System.err.println("Problem z zamknieciem polaczenia");
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         CoreDB db = new CoreDB();
-        db.addTask("elo", "melo", 1, 500, true, false);
-        //db.addTask("gelo", "melo", 1, true, false);
+        db.addTask("kupic chleb", "wazne zadanie", 1, 500, true, false);
+        db.addTask("kupic maslo", "wazne niesamowicie zadanie", 1, 500, true, false);
+        db.addTask("sprzedac konia", "wazne bardzo zadanie", 1, 500, true, false);
 
-        System.out.println(db.getTaskByName("elo"));
+        db.addExecutedTask(db.getTaskByName("kupic chleb").getId(),
+                500, 700, 200, true);
+        db.addExecutedTask(db.getTaskByName("kupic maslo").getId(),
+                500, 700, 200, false);
     }
 
 }
