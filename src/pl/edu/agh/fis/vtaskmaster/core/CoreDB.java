@@ -1,5 +1,6 @@
 package pl.edu.agh.fis.vtaskmaster.core;
 
+import com.sun.javafx.tk.Toolkit;
 import org.sqlite.SQLiteConfig;
 import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
 import pl.edu.agh.fis.vtaskmaster.core.model.Task;
@@ -44,8 +45,7 @@ public class CoreDB {
     // creates tables in the database
     public boolean initDB() {
         String createTasks = "CREATE TABLE IF NOT EXISTS tasks(" +
-                "id             INTEGER         PRIMARY KEY AUTOINCREMENT, " +
-                "name           varchar(45)     NOT NULL, " +
+                "name           varchar(45)     PRIMARY KEY NOT NULL, " +
                 "description    TEXT, " +
                 "priority       SMALLINT        NOT NULL, " +
                 "expectedTime   BIGINT         NOT NULL, " +
@@ -55,12 +55,12 @@ public class CoreDB {
 
         String createExecutedTasks = "CREATE TABLE IF NOT EXISTS executedTasks(" +
                 "id             INTEGER         PRIMARY KEY AUTOINCREMENT, " +
-                "task_id        INTEGER, " +
+                "taskName       varchar(45), " +
                 "startTime      BIGINT          NOT NULL, " +
                 "endTime        BIGINT          NOT NULL, " +
                 "duration       BIGINT          NOT NULL, " +
                 "done           BOOLEAN         NOT NULL, " +
-                "FOREIGN KEY(task_id)           REFERENCES tasks(id))";
+                "FOREIGN KEY(taskName)           REFERENCES tasks(name))";
 
         try {
             statement.execute(createTasks);
@@ -78,7 +78,7 @@ public class CoreDB {
                            boolean favourite, boolean todo) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO tasks VALUES (NULL, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO tasks VALUES (?, ?, ?, ?, ?, ?)"
             );
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, description);
@@ -96,13 +96,13 @@ public class CoreDB {
         return true;
     }
 
-    public boolean addExecutedTask(int taskId, long startTime, long endTime,
+    public boolean addExecutedTask(String taskName, long startTime, long endTime,
                                    long totalDuration, boolean done) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
             );
-            preparedStatement.setInt(1, taskId);
+            preparedStatement.setString(1, taskName);
             preparedStatement.setLong(2, startTime);
             preparedStatement.setLong(3, endTime);
             preparedStatement.setLong(4, totalDuration);
@@ -117,92 +117,90 @@ public class CoreDB {
         return true;
     }
 
-    public ArrayList<Task> getAllTasks() {
-        ArrayList<Task> allTasks = new ArrayList<>();
-        try {
-            ResultSet result = statement.executeQuery("SELECT * FROM tasks");
-            int id, priority;
-            boolean favourite, todo;
-            String name, description;
-            long expectedTime;
-            while(result.next()) {
-                id = result.getInt("id");
-                name = result.getString("name");
-                description = result.getString("description");
-                priority = result.getInt("priority");
-                expectedTime = result.getLong("expectedTime");
-                favourite = result.getBoolean("favourite");
-                todo = result.getBoolean("todo");
 
-                allTasks.add(
-                        new Task(id, name, description, priority, expectedTime, favourite, todo)
-                );
-            }
+
+    public ArrayList<Task> getTasksWithCondition(String condition) throws SQLException {
+        ArrayList<Task> tasks = new ArrayList<>();
+        ResultSet result = statement.executeQuery("SELECT * FROM tasks " + condition);
+        int priority;
+        boolean favourite, todo;
+        String name, description;
+        long expectedTime;
+        while(result.next()) {
+            name = result.getString("name");
+            description = result.getString("description");
+            priority = result.getInt("priority");
+            expectedTime = result.getLong("expectedTime");
+            favourite = result.getBoolean("favourite");
+            todo = result.getBoolean("todo");
+
+            tasks.add(
+                    new Task(name, description, priority, expectedTime, favourite, todo)
+            );
         }
-        catch (SQLException e) {
-            System.err.println("Błąd przy odczycie zadań");
-            e.printStackTrace();
-        }
-        return allTasks;
+        return tasks;
     }
 
-    Task getTaskByName(String name) {
+    public ArrayList<Task> getTodo() throws SQLException {
+        return getTasksWithCondition("WHERE todo");
+    }
+
+    public ArrayList<Task> getFavourites() throws SQLException {
+        return getTasksWithCondition("WHERE favourite");
+    }
+
+    public ArrayList<Task> getAllTasks() throws SQLException {
+        return getTasksWithCondition("");
+    }
+
+    Task getTaskByName(String name) throws SQLException {
         int id, priority;
         boolean favourite, todo;
         String description;
         long expectedTime;
         Task task = null;
-        try {
-            ResultSet result = statement.executeQuery("SELECT * FROM tasks WHERE name='"
-                    + name + "'");
 
-            if (result.next()) {
-                id = result.getInt("id");
-                priority = result.getInt("priority");
-                description = result.getString("description");
-                expectedTime = result.getLong("expectedTime");
-                favourite = result.getBoolean("favourite");
-                todo = result.getBoolean("todo");
+        ResultSet result = statement.executeQuery("SELECT * FROM tasks WHERE name='"
+                + name + "'");
 
-                task = new Task(id, name, description, priority, expectedTime, favourite, todo);
-            }
-            else
-            {
-                // there's no such task
-                return null;
-            }
+        if (result.next()) {
+            priority = result.getInt("priority");
+            description = result.getString("description");
+            expectedTime = result.getLong("expectedTime");
+            favourite = result.getBoolean("favourite");
+            todo = result.getBoolean("todo");
+
+            task = new Task(name, description, priority, expectedTime, favourite, todo);
         }
-        catch (SQLException e) {
-            System.err.println("Błąd przy odczycie zadania");
-            e.printStackTrace();
+        else
+        {
+            // there's no such task
+            return null;
         }
         return task;
     }
 
-    public ArrayList<ExecutedTask> getAllExecutedTasks() {
+    public ArrayList<ExecutedTask> getAllExecutedTasks() throws SQLException {
         ArrayList<ExecutedTask> allTasks = new ArrayList<>();
-        try {
-            ResultSet result = statement.executeQuery("SELECT * FROM executedTasks");
-            int id, taskId;
-            boolean done;
-            long startTime, endTime, elapsedTime;
-            while(result.next()) {
-                id = result.getInt("id");
-                taskId = result.getInt("task_id");
-                done = result.getBoolean("done");
-                startTime = result.getLong("startTime");
-                endTime = result.getLong("endTime");
-                elapsedTime = result.getLong("duration");
 
-                allTasks.add(
-                        new ExecutedTask(taskId, startTime, endTime, elapsedTime, done)
-                );
-            }
+        ResultSet result = statement.executeQuery("SELECT * FROM executedTasks");
+        String taskName;
+        int id;
+        boolean done;
+        long startTime, endTime, elapsedTime;
+        while(result.next()) {
+            id = result.getInt("id");
+            taskName = result.getString("taskName");
+            done = result.getBoolean("done");
+            startTime = result.getLong("startTime");
+            endTime = result.getLong("endTime");
+            elapsedTime = result.getLong("duration");
+
+            allTasks.add(
+                    new ExecutedTask(taskName, startTime, endTime, elapsedTime, done)
+            );
         }
-        catch (SQLException e) {
-            System.err.println("Błąd przy odczycie wykonanych zadań");
-            e.printStackTrace();
-        }
+
         return allTasks;
     }
 
@@ -217,14 +215,16 @@ public class CoreDB {
 
     public static void main(String[] args) {
         CoreDB db = new CoreDB();
-        db.addTask("kupic chleb", "wazne zadanie", 1, 500, true, false);
-        db.addTask("kupic maslo", "wazne niesamowicie zadanie", 1, 500, true, false);
-        db.addTask("sprzedac konia", "wazne bardzo zadanie", 1, 500, true, false);
+        //db.addTask("kupic chleb", "wazne zadanie", 1, 500, true, false);
+        //db.addTask("kupic maslo", "wazne niesamowicie zadanie", 1, 500, true, false);
+        //db.addTask("sprzedac koniaszka", "wazne bardzo zadanie", 1, 500, false, false);
+        try {
+            db.getAllTasks().forEach(System.out::println);
+        }
+        catch (SQLException e) {
 
-        db.addExecutedTask(db.getTaskByName("kupic chleb").getId(),
-                500, 700, 200, true);
-        db.addExecutedTask(db.getTaskByName("kupic maslo").getId(),
-                500, 700, 200, false);
+        }
+
     }
 
 }
