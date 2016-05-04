@@ -146,8 +146,6 @@ public class CoreDB {
         return true;
     }
 
-
-
     private ArrayList<Task> getTasksWithCondition(String condition) throws SQLException {
         ArrayList<Task> tasks = new ArrayList<>();
         ResultSet result = statement.executeQuery("SELECT * FROM tasks " + condition);

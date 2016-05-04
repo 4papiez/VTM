@@ -95,6 +95,11 @@ public class CoreManager {
         return tasks;
     }
 
+    /**
+     * Removes task with a given name from the DB.
+     * @param taskName - name of task which you want to remove
+     * @return Boolean - true on success and false on failure (failure probably means that there was no such task)
+     */
     public boolean removeTaskByName(String taskName) {
         try {
             db.removeTaskByName(taskName);
@@ -105,6 +110,18 @@ public class CoreManager {
         return true;
     }
 
+    /**
+     * This method helps to save tasks in DB - if there's already task with a given name, it updates it. Otherwise -
+     * new task is added.
+     *
+     * It's important, that if you get task from DB and change its name, it still remembers its old name
+     * in member variable oldName. It allows to update tasks even if their names were changed.
+     * @see pl.edu.agh.fis.vtaskmaster.core.model.Task#oldName
+     *
+     *
+     * @param task - task which you want to save
+     * @return Boolean - true on success and false on failure
+     */
     public boolean saveTask(Task task) {
         try {
             // there's already task with a given (old) name, so just update it
@@ -122,6 +139,20 @@ public class CoreManager {
         return true;
     }
 
+    /**
+     * Method starts executing task, which means that it's added to table in DB called ExecutedTasks.
+     * @see pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask
+     *
+     * You should pass current time (type: long) as the second parameter. It will be stored as a starting time.
+     *
+     * This method is connected with
+     * {@link pl.edu.agh.fis.vtaskmaster.core.CoreManager#finishTask(ExecutedTask)}
+     * {@link pl.edu.agh.fis.vtaskmaster.core.CoreManager#updateExecutedTask(ExecutedTask)}
+     *
+     * @param task - task which you want to start executing
+     * @param startTime - here you should pass current time
+     * @return Boolean - true on success and false on failure
+     */
     public boolean executeTask(Task task, long startTime) {
         try {
             db.addExecutedTask(task, startTime);
@@ -130,6 +161,40 @@ public class CoreManager {
             return false;
         }
         return true;
+    }
+
+    /**
+     * It updates executed task.
+     *
+     * You should use it to update elapsedTime of the task.
+     * Simple example:
+     *  task.setElapsedTime(elapsedTime);
+     *  manager.updateExecutedTask(task);}
+     *
+     * @param task - ExecutedTask which you want to update
+     * @return Boolean - true on success and false on failure
+     */
+    public boolean updateExecutedTask(ExecutedTask task) {
+        try {
+            db.updateExecutedTask(task);
+        }
+        catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Finishes execution of the task (basically - just sets done flag and its endTime).
+     *
+     * @param task - task which you want to finish
+     * @param endTime - you should pass current time
+     * @return
+     */
+    public boolean finishTask(ExecutedTask task, long endTime) {
+        task.setDone(true);
+        task.setEndTime(endTime);
+        return updateExecutedTask(task);
     }
 
 
