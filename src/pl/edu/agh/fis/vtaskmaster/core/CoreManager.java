@@ -20,6 +20,17 @@ public class CoreManager {
         db = new CoreDB();
     }
 
+    public CoreManager(String dbName) {
+        db = new CoreDB(dbName);
+    }
+
+
+    /**
+     * Closes connection with database. Should be called when finishing work with Database.
+     */
+    public void finalize() {
+        db.closeConnection();
+    }
 
     /**
      * @return ArrayList of all tasks from the DB.
@@ -51,7 +62,7 @@ public class CoreManager {
     }
 
     /**
-     * @param taskName - name of the task.
+     * @param taskName name of the task.
      * @return Task with a given name or null if there's no such task.
      */
     public Task getTaskByName(String taskName) {
@@ -96,8 +107,24 @@ public class CoreManager {
     }
 
     /**
+     * Gets list of tasks which were executed and were finished.
+     *
+     * @return ArrayList of {@link pl.edu.agh.fis.vtaskmaster.core.model.Task} which were executed and finished.
+     */
+    public ArrayList<Task> getHistory() {
+        ArrayList<Task> tasks;
+        try {
+            tasks = db.getHistory();
+        }
+        catch (SQLException e) {
+            tasks = null;
+        }
+        return tasks;
+    }
+
+    /**
      * Removes task with a given name from the DB.
-     * @param taskName - name of task which you want to remove
+     * @param taskName name of task which you want to remove
      * @return Boolean - true on success and false on failure (failure probably means that there was no such task)
      */
     public boolean removeTaskByName(String taskName) {
@@ -119,7 +146,7 @@ public class CoreManager {
      * @see pl.edu.agh.fis.vtaskmaster.core.model.Task#oldName
      *
      *
-     * @param task - task which you want to save
+     * @param task task which you want to save
      * @return Boolean - true on success and false on failure
      */
     public boolean saveTask(Task task) {
@@ -141,17 +168,18 @@ public class CoreManager {
 
     /**
      * Method starts executing task, which means that it's added to table in DB called ExecutedTasks.
-     * @see pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask
      *
      * You should pass current time (type: long) as the second parameter. It will be stored as a starting time.
      *
      * This method is connected with
-     * {@link pl.edu.agh.fis.vtaskmaster.core.CoreManager#finishTask(ExecutedTask)}
+     * {@link pl.edu.agh.fis.vtaskmaster.core.CoreManager#finishTask(ExecutedTask, long)}
      * {@link pl.edu.agh.fis.vtaskmaster.core.CoreManager#updateExecutedTask(ExecutedTask)}
      *
-     * @param task - task which you want to start executing
-     * @param startTime - here you should pass current time
+     * @param task task which you want to start executing
+     * @param startTime here you should pass current time
      * @return Boolean - true on success and false on failure
+     *
+     * @see pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask
      */
     public boolean executeTask(Task task, long startTime) {
         try {
@@ -171,7 +199,7 @@ public class CoreManager {
      *  task.setElapsedTime(elapsedTime);
      *  manager.updateExecutedTask(task);}
      *
-     * @param task - ExecutedTask which you want to update
+     * @param task ExecutedTask which you want to update
      * @return Boolean - true on success and false on failure
      */
     public boolean updateExecutedTask(ExecutedTask task) {
@@ -187,16 +215,15 @@ public class CoreManager {
     /**
      * Finishes execution of the task (basically - just sets done flag and its endTime).
      *
-     * @param task - task which you want to finish
-     * @param endTime - you should pass current time
-     * @return
+     * @param task task which you want to finish
+     * @param endTime you should pass current time
+     * @return Boolean - true on success and false on failure
      */
     public boolean finishTask(ExecutedTask task, long endTime) {
         task.setDone(true);
         task.setEndTime(endTime);
         return updateExecutedTask(task);
     }
-
 
 
     public static void main(String[] args) {

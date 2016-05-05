@@ -41,6 +41,29 @@ public class CoreDB {
         initDB();
     }
 
+    public CoreDB(String dbName) {
+        try {
+            Class.forName(CoreDB.DRIVER);
+        }
+        catch (ClassNotFoundException e) {
+            System.err.println("Nie znaleziono sterownika JDBC");
+            e.printStackTrace();
+        }
+
+        try {
+            SQLiteConfig config = new SQLiteConfig();
+            config.enforceForeignKeys(true);
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dbName, config.toProperties());
+            statement = connection.createStatement();
+        }
+        catch (SQLException e) {
+            System.err.println("Błąd połączenia z bazą");
+            e.printStackTrace();
+        }
+
+        initDB();
+    }
+
     // creates tables in the database
     public boolean initDB() {
         String createTasks = "CREATE TABLE IF NOT EXISTS tasks(" +
@@ -73,24 +96,18 @@ public class CoreDB {
         return true;
     }
 
-    public boolean addTask(Task task) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO tasks VALUES (?, ?, ?, ?, ?, ?)"
-            );
-            preparedStatement.setString(1, task.getName());
-            preparedStatement.setString(2, task.getDescription());
-            preparedStatement.setInt(3, task.getPriority());
-            preparedStatement.setLong(4, task.getExpectedTime());
-            preparedStatement.setBoolean(5, task.isFavourite());
-            preparedStatement.setBoolean(6, task.isTodo());
-            preparedStatement.execute();
-        }
-        catch (SQLException e) {
-            System.err.println("Błąd przy dodawaniu zadania");
-            e.printStackTrace();
-            return false;
-        }
+    public boolean addTask(Task task) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO tasks VALUES (?, ?, ?, ?, ?, ?)"
+        );
+        preparedStatement.setString(1, task.getName());
+        preparedStatement.setString(2, task.getDescription());
+        preparedStatement.setInt(3, task.getPriority());
+        preparedStatement.setLong(4, task.getExpectedTime());
+        preparedStatement.setBoolean(5, task.isFavourite());
+        preparedStatement.setBoolean(6, task.isTodo());
+        preparedStatement.execute();
+
         return true;
     }
 
@@ -146,9 +163,9 @@ public class CoreDB {
         return true;
     }
 
-    private ArrayList<Task> getTasksWithCondition(String condition) throws SQLException {
+    private ArrayList<Task> getTasksWithQuery(String query) throws SQLException {
         ArrayList<Task> tasks = new ArrayList<>();
-        ResultSet result = statement.executeQuery("SELECT * FROM tasks " + condition);
+        ResultSet result = statement.executeQuery(query);
         int priority;
         boolean favourite, todo;
         String name, description;
@@ -168,16 +185,25 @@ public class CoreDB {
         return tasks;
     }
 
+
     public ArrayList<Task> getTodo() throws SQLException {
-        return getTasksWithCondition("WHERE todo");
+        return getTasksWithQuery("SELECT * FROM tasks WHERE todo");
     }
 
     public ArrayList<Task> getFavourites() throws SQLException {
-        return getTasksWithCondition("WHERE favourite");
+        return getTasksWithQuery("SELECT * FROM tasks WHERE favourite");
     }
 
     public ArrayList<Task> getAllTasks() throws SQLException {
-        return getTasksWithCondition("");
+        return getTasksWithQuery("SELECT * FROM tasks");
+    }
+
+    public ArrayList<Task> getHistory() throws SQLException {
+        return getTasksWithQuery(
+                "SELECT name, description, priority, expectedTime, favourite, todo " +
+                        "FROM tasks AS T JOIN executedTasks AS E " +
+                        "ON E.taskName=T.name"
+        );
     }
 
     Task getTaskByName(String name) throws SQLException {
@@ -208,7 +234,7 @@ public class CoreDB {
     }
 
     public boolean isTaskWithName(String taskName) throws SQLException {
-        ResultSet result = statement.executeQuery("SELECT 1 FROM tasks WHERE name=" + taskName);
+        ResultSet result = statement.executeQuery("SELECT * FROM tasks WHERE name = '" + taskName + "'");
         return result.getFetchSize() == 1;
     }
 
