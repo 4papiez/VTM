@@ -16,7 +16,7 @@ import javax.swing.Timer;
  * @version preprepre0.000000001zeta
  *
  */
-public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely cool light witch informs whether the task is in progress or not
+public class VTaskControlWindow extends JDialog {
 
 	/**
 	 * 
@@ -29,6 +29,7 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 	enum VTCState{
 		vtcwStarted,
 		vtcwPaused,
+		vtcwFinished,
 	}
 	
 	VTCState state = VTCState.vtcwStarted;
@@ -39,6 +40,7 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 	JLabel lblVTimeHours;
 	JLabel lblVTimeMinutes;
 	JLabel lblVTaskName;
+	JLabel lblInProgress;
 
 	/**
 	 * Launch the application.
@@ -76,7 +78,7 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 		VTPause = new JButton("");
 		VTPause.setBounds(200, 5, 40, 40);
 		
-		VTStop = new JButton(""); //TODO VTCW implement STOP button, after defining proper behavior of stopping program
+		VTStop = new JButton("");
 		VTStop.setBounds(240, 5, 40, 40);
 		
 		VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtplay.png"));
@@ -93,6 +95,10 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 		lblVTimeMinutes = new JLabel(taskTimeMins);
 		lblVTimeMinutes.setBounds(28, 20, 32, 15);
 		contentPane.add(lblVTimeMinutes);
+		
+		lblInProgress = new JLabel(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+		lblInProgress.setBounds(145,30,10,10);
+		contentPane.add(lblInProgress);
 		
 		JLabel lblVTimeColon = new JLabel(":");
 		lblVTimeColon.setBounds(25, 20, 32, 15);

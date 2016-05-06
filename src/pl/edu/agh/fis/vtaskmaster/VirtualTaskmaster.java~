@@ -1,13 +1,12 @@
 package pl.edu.agh.fis.vtaskmaster;
 
-import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.table.DefaultTableModel;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -19,6 +18,7 @@ import pl.edu.agh.fis.vtaskmaster.VTasksManager.returnState;
 
 /**
  * 
+ * @author Grzegorz Burzyński
  * @author Kamil Piastowicz
  * @version 0.000000002zeta
  *
@@ -62,8 +62,8 @@ public class VirtualTaskmaster {
 	 */
 	private void initialize() {
 		vTMW = new VTMainWindow();
-		vTM = new VTasksManager(); //TODO on click - get values from selected row to editor
-		vtcwTab = new VTaskControlWindow[5]; 
+		vTM = new VTasksManager();
+		vtcwTab = new VTaskControlWindow[5];
 		currTime = new long[5];
 		elapsedTime = new long[5];
 		startTime = new long[5];
@@ -184,22 +184,20 @@ public class VirtualTaskmaster {
 				}
 			}
 		});
-		vTM.btnFavourites.addMouseListener(new MouseAdapter() {
+		vTM.btnFavourites.addMouseListener(new MouseAdapter() { //FIXME VTM adding empty line to tblFavourites if user on tab "Favorites"
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if((JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0])) == vTM.tblHistory){
-					((DefaultTableModel) vTM.tblFavourites.getModel()).addRow(new Object[]{null,null,null,null});
-					int row = VTasksManager.tblFindEmptyRow(vTM.tblFavourites);
-					int selRow = vTM.tblHistory.getSelectedRow();
-					if(selRow != -1 && vTM.tblHistory.getValueAt(selRow, 0)!=null)
-					 {
-						vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,0), row, 0);
-						vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,1), row, 1);
-						vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,2), row, 2);
-						vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,3), row, 3);
-					}else{
-						JOptionPane.showMessageDialog(new JFrame(), "You need to select a filled row.");
-					}
+				((DefaultTableModel) vTM.tblFavourites.getModel()).addRow(new Object[]{null,null,null,null});
+				int row = VTasksManager.tblFindEmptyRow(vTM.tblFavourites);
+				int selRow = vTM.tblHistory.getSelectedRow();
+				if(selRow != -1 && vTM.tblHistory.getValueAt(selRow, 0)!=null)
+				 {
+					vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,0), row, 0);
+					vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,1), row, 1);
+					vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,2), row, 2);
+					vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,3), row, 3);
+				}else{
+					JOptionPane.showMessageDialog(new JFrame(), "You need to select a filled row.");
 				}
 			}
 		});
@@ -221,7 +219,7 @@ public class VirtualTaskmaster {
 					vTM.setVisible(false);
 			}
 		});
-		vTM.btnToList.addMouseListener(new MouseAdapter() { //FIXME check whether task name is free
+		vTM.btnToList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
@@ -279,7 +277,6 @@ public class VirtualTaskmaster {
 				state[0] = VTCState.vtcwStarted;
 				currTime[0] = System.currentTimeMillis();
 				startTime[0] = currTime[0];
-				vtcwTab[0].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
 			}
 		};
 		MouseAdapter mAdapterPause = new MouseAdapter() {
@@ -287,21 +284,10 @@ public class VirtualTaskmaster {
 			public void mouseClicked(MouseEvent e) {
 				state[0] = VTCState.vtcwPaused;
 				elapsedTime[0] = elapsedTime[0] - (currTime[0] - startTime[0]);
-				vtcwTab[0].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
-			}
-		};
-		MouseAdapter mAdapterStop = new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[0] = VTCState.vtcwFinished; vtcwTab[0].active = false; vtcwTab[0].setVisible(false);
-				elapsedTime[0] = elapsedTime[0] - (currTime[0] - startTime[0]);
-				vtcwTab[0] = new VTaskControlWindow("empty slot", "00", "00");
-				vTMW.vtcwLblTab[0].setText("Empty slot");
 			}
 		};
 		vtcwTab[0].VTPlay.addMouseListener(mAdapterPlay);
 		vtcwTab[0].VTPause.addMouseListener(mAdapterPause);
-		vtcwTab[0].VTStop.addMouseListener(mAdapterStop);
 		
 		mAdapterPlay = new MouseAdapter() {
 			@Override
@@ -309,7 +295,6 @@ public class VirtualTaskmaster {
 				state[1] = VTCState.vtcwStarted;
 				currTime[1] = System.currentTimeMillis();
 				startTime[1] = currTime[1];
-				vtcwTab[1].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
 			}
 		};
 		mAdapterPause = new MouseAdapter() {
@@ -317,21 +302,10 @@ public class VirtualTaskmaster {
 			public void mouseClicked(MouseEvent e) {
 				state[1] = VTCState.vtcwPaused;
 				elapsedTime[1] = elapsedTime[1] - (currTime[1] - startTime[1]);
-				vtcwTab[1].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
-			}
-		};
-		mAdapterStop = new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[1] = VTCState.vtcwFinished; vtcwTab[1].active = false; vtcwTab[1].setVisible(false);
-				elapsedTime[1] = elapsedTime[1] - (currTime[1] - startTime[1]);
-				vtcwTab[1] = new VTaskControlWindow("empty slot", "00", "00");
-				vTMW.vtcwLblTab[1].setText("Empty slot");
 			}
 		};
 		vtcwTab[1].VTPlay.addMouseListener(mAdapterPlay);
 		vtcwTab[1].VTPause.addMouseListener(mAdapterPause);
-		vtcwTab[1].VTStop.addMouseListener(mAdapterStop);
 		
 		mAdapterPlay = new MouseAdapter() {
 		@Override
@@ -339,7 +313,6 @@ public class VirtualTaskmaster {
 				state[2] = VTCState.vtcwStarted;
 				currTime[2] = System.currentTimeMillis();
 				startTime[2] = currTime[2];
-				vtcwTab[2].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
 			}
 		};
 		mAdapterPause = new MouseAdapter() {
@@ -347,21 +320,10 @@ public class VirtualTaskmaster {
 			public void mouseClicked(MouseEvent e) {
 				state[2] = VTCState.vtcwPaused;
 				elapsedTime[2] = elapsedTime[2] - (currTime[2] - startTime[2]);
-				vtcwTab[2].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
-			}
-		};
-		mAdapterStop = new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[2] = VTCState.vtcwFinished; vtcwTab[2].active = false; vtcwTab[2].setVisible(false);
-				elapsedTime[2] = elapsedTime[2] - (currTime[2] - startTime[2]);
-				vtcwTab[2] = new VTaskControlWindow("empty slot", "00", "00");
-				vTMW.vtcwLblTab[2].setText("Empty slot");
 			}
 		};
 		vtcwTab[2].VTPlay.addMouseListener(mAdapterPlay);
 		vtcwTab[2].VTPause.addMouseListener(mAdapterPause);
-		vtcwTab[2].VTStop.addMouseListener(mAdapterStop);
 		
 		mAdapterPlay = new MouseAdapter() {
 			@Override
@@ -369,67 +331,41 @@ public class VirtualTaskmaster {
 					state[3] = VTCState.vtcwStarted;
 					currTime[3] = System.currentTimeMillis();
 					startTime[3] = currTime[3];
-					vtcwTab[3].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
 				}
 			};
-		mAdapterPause = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[3] = VTCState.vtcwPaused;
-				elapsedTime[3] = elapsedTime[3] - (currTime[3] - startTime[3]);
-				vtcwTab[3].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
-			}
-		};
-		mAdapterStop = new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[3] = VTCState.vtcwFinished; vtcwTab[3].active = false; vtcwTab[3].setVisible(false);
-				elapsedTime[3] = elapsedTime[3] - (currTime[3] - startTime[3]);
-				vtcwTab[3] = new VTaskControlWindow("empty slot", "00", "00");
-				vTMW.vtcwLblTab[3].setText("Empty slot");
-			}
-		};
-		vtcwTab[3].VTPlay.addMouseListener(mAdapterPlay);
-		vtcwTab[3].VTPause.addMouseListener(mAdapterPause);
-		vtcwTab[3].VTStop.addMouseListener(mAdapterStop);
+			mAdapterPause = new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					state[3] = VTCState.vtcwPaused;
+					elapsedTime[3] = elapsedTime[3] - (currTime[3] - startTime[3]);
+				}
+			};
+			vtcwTab[3].VTPlay.addMouseListener(mAdapterPlay);
+			vtcwTab[3].VTPause.addMouseListener(mAdapterPause);
 			
-		mAdapterPlay = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[4] = VTCState.vtcwStarted;
-				currTime[4] = System.currentTimeMillis();
-				startTime[4] = currTime[4];
-				vtcwTab[4].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
-			}
-		};
-		mAdapterPause = new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[4] = VTCState.vtcwPaused;
-				elapsedTime[4] = elapsedTime[4] - (currTime[4] - startTime[4]);
-				vtcwTab[4].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
-			}
-		};
-		mAdapterStop = new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				state[4] = VTCState.vtcwFinished; vtcwTab[4].active = false; vtcwTab[4].setVisible(false);
-				elapsedTime[4] = elapsedTime[4] - (currTime[4] - startTime[4]);
-				vtcwTab[4] = new VTaskControlWindow("empty slot", "00", "00");
-				vTMW.vtcwLblTab[4].setText("Empty slot");
-			}
-		};
-		vtcwTab[4].VTPlay.addMouseListener(mAdapterPlay);
-		vtcwTab[4].VTPause.addMouseListener(mAdapterPause);
-		vtcwTab[4].VTStop.addMouseListener(mAdapterStop);
-	}		
+			mAdapterPlay = new MouseAdapter() {
+				@Override
+					public void mouseClicked(MouseEvent e) {
+						state[4] = VTCState.vtcwStarted;
+						currTime[4] = System.currentTimeMillis();
+						startTime[4] = currTime[4];
+					}
+				};
+				mAdapterPause = new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						state[4] = VTCState.vtcwPaused;
+						elapsedTime[4] = elapsedTime[4] - (currTime[4] - startTime[4]);
+					}
+				};
+				vtcwTab[4].VTPlay.addMouseListener(mAdapterPlay);
+				vtcwTab[4].VTPause.addMouseListener(mAdapterPause);
+		}
+		
+		
+		
 		/**
 		 * VTaskmaster auxiliary functions
-		 */
-	
-		/**
-		 * 
-		 * @return index of empty "handler" [button and label in main window]
 		 */
 		private int findEmptyHandler(){
 			for(int i = 0; i < 5; i++){
@@ -438,14 +374,6 @@ public class VirtualTaskmaster {
 			}
 			return -1;
 		}
-		/**
-		 * 
-		 * @brief handles created tasks 
-		 * @param h - user-chosen estimated time (hours)
-		 * @param min - user-chosen estimated time (minutes)
-		 * @param task - user-typed task description
-		 * @param prior - user-chosen priority of the task
-		 */
 		void handleVTCW(int h, int min, String task, int prior){
 			int handler = findEmptyHandler();
 			if(handler != -1){
@@ -456,37 +384,31 @@ public class VirtualTaskmaster {
 				vtcwTab[handler].setVisible(true);
 				vtcwTab[handler].active = true;
 				vTMW.vtcwLblTab[handler].setText(task);
-				currTime[handler] = System.currentTimeMillis();
-				startTime[handler] = currTime[handler];
-				state[handler] = VTCState.vtcwStarted;
+				startTime[handler] = System.currentTimeMillis();
 				elapsedTime[handler] = elapsedTimeCalc(vtcwTab[handler].lblVTimeHours.getText(),
 						                               vtcwTab[handler].lblVTimeMinutes.getText());
-
 			}else{
 				JOptionPane.showMessageDialog(new JFrame(), "Probably, you need to rest...");
 			}	
 		}
+		
 		/**
-		 * @param cWin - ControlWindow whose time is going to be changed
-		 * @param retHourTxt - determines which will be returned - hours or minutes
+		 * @param cWin - ControlWindow which time is going to be changed
+		 * @param retHourTxt - determines with will be returned - hours or minutes
 		 * @return properly formatted String
 		 */
-		String countDownTime(int winIndx, boolean retHourTxt) { //FIXME (time) sometimes shit happens
+		String countDownTime(int winIndx, boolean retHourTxt) { 
 			currTime[winIndx] = System.currentTimeMillis();
 			long time = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
 			int timeH = (int) (time/3600000);
-			int timeM = (int) ((time - timeH*3600000)/60000);
-			
-			if(timeM == 0 && timeH == 0){
-				vtcwTab[winIndx].lblVTimeHours.setForeground(Color.RED);
-				vtcwTab[winIndx].lblVTimeMinutes.setForeground(Color.RED);
-			}
 			
 			if(retHourTxt){
-				return VTMainWindow.timeFiller(Math.abs(timeH));
+				return VTMainWindow.timeFiller(timeH);
 			}else{
-				return VTMainWindow.timeFiller(Math.abs(timeM));
+				int timeM = (int) ((time - timeH*3600000)/60000);
+				return VTMainWindow.timeFiller(timeM);
 			}
+			
 		}
 		/**
 		 * 
@@ -500,3 +422,4 @@ public class VirtualTaskmaster {
 			return hour*3600000+min*60000;
 		}
 }
+
