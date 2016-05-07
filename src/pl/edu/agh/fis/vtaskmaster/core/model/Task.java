@@ -1,22 +1,24 @@
 package pl.edu.agh.fis.vtaskmaster.core.model;
 
-/**
- * Created by Grzegorz on 25.04.2016.
- */
+
 public class Task {
-    private int id;
     private String name;
+    private String oldName;
     private String description;
     private int priority;
-    boolean favourite;
-    boolean todo;
+    private long expectedTime;
+    private boolean favourite;
+    private boolean todo;
 
-    public int getId() {
-        return id;
+    public String getOldName() {
+        return oldName;
+    }
+    public long getExpectedTime() {
+        return expectedTime;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setExpectedTime(long expectedTime) {
+        this.expectedTime = expectedTime;
     }
 
     public String getName() {
@@ -59,11 +61,12 @@ public class Task {
         this.todo = todo;
     }
 
-    public Task(int id, String name, String description, int priority, boolean favourite, boolean todo) {
-        this.id = id;
+    public Task(String name, String description, int priority, long expectedTime, boolean favourite, boolean todo) {
         this.name = name;
+        this.oldName = name;
         this.description = description;
         this.priority = priority;
+        this.expectedTime = expectedTime;
         this.favourite = favourite;
         this.todo = todo;
     }
@@ -71,10 +74,10 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", priority=" + priority +
+                ", expected time=" + expectedTime +
                 ", favourite=" + favourite +
                 ", todo=" + todo +
                 '}';

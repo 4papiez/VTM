@@ -1,40 +1,69 @@
 package pl.edu.agh.fis.vtaskmaster.core.model;
 
-/**
- * Created by Grzegorz on 25.04.2016.
- */
-public class ExecutedTask {
-    private int taskId;
-    private long startTime;
-    private long endDate;
 
-    public int getTaskId() {
-        return taskId;
+public class ExecutedTask {
+    private int id;
+    private String taskName;
+    private long startTime;
+    private long endTime;
+    private long elapsedTime;
+    private boolean done;
+
+    public int getId() {
+        return id;
     }
 
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public long getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public void setElapsedTime(long elapsedTime) {
+        this.elapsedTime = elapsedTime;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 
     public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public ExecutedTask(int id, String taskName, long startTime, long endTime,
+                        long elapsedTime, boolean done) {
+        this.id = id;
+        this.taskName = taskName;
         this.startTime = startTime;
+        this.endTime = endTime;
+        this.elapsedTime = elapsedTime;
+        this.done = done;
     }
 
-    public long getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(long endDate) {
-        this.endDate = endDate;
-    }
-
-    public ExecutedTask(int taskId, long startTime, long endDate) {
-        this.taskId = taskId;
-        this.startTime = startTime;
-        this.endDate = endDate;
+    @Override
+    public String toString() {
+        return "ExecutedTask{" +
+                "id = " + id +
+                ", taskName=" + taskName +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", elapsedTime=" + elapsedTime +
+                ", done=" + done +
+                '}';
     }
 }
