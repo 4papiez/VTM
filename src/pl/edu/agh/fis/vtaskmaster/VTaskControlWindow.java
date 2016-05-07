@@ -17,31 +17,22 @@ import javax.swing.Timer;
  *
  */
 public class VTaskControlWindow extends JDialog {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	Timer tmrH;
-	boolean active;
-	
 	enum VTCState{
 		vtcwStarted,
 		vtcwPaused,
 		vtcwFinished,
-	}
-	
+	}	
+	private static final long serialVersionUID = 1L;		
+	//Panes//
+	private JPanel contentPane;	
+	//Input//
+	JButton VTPlay, VTPause, VTStop;
+	//Visual//
+	JLabel lblVTimeHours, lblVTimeMinutes, lblVTaskName,lblInProgress;
+	//Logic//
 	VTCState state = VTCState.vtcwStarted;
-	JButton VTPlay;
-	JButton VTPause;
-	JButton VTStop;
-	
-	JLabel lblVTimeHours;
-	JLabel lblVTimeMinutes;
-	JLabel lblVTaskName;
-	JLabel lblInProgress;
-
+	boolean active;
+	Timer tmrH;
 	/**
 	 * Launch the application.
 	 */
@@ -64,6 +55,7 @@ public class VTaskControlWindow extends JDialog {
 	public VTaskControlWindow(String taskName, String taskTimeHours, String taskTimeMins) {
 		active = false;
 		setVisible(false);
+		setResizable(false);
 		
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 294, 77);

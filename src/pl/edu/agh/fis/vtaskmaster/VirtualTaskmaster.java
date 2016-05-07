@@ -16,10 +16,12 @@ import javax.swing.Timer;
 
 import pl.edu.agh.fis.vtaskmaster.VTaskControlWindow.VTCState;
 import pl.edu.agh.fis.vtaskmaster.VTasksManager.returnState;
+import pl.edu.agh.fis.vtaskmaster.core.*;
 
 /**
  * 
  * @author Kamil Piastowicz
+ * @author Wiktor Wudarczyk
  * @version 0.000000002zeta
  *
  */
@@ -33,6 +35,7 @@ public class VirtualTaskmaster {
 	private long[] startTime;
 	private long[] elapsedTime;
 	private Timer tmrMin;
+	private CoreManager database;
 	
 
 	/**
@@ -71,9 +74,9 @@ public class VirtualTaskmaster {
 		for(int i = 0; i < 5; i++)
 			vtcwTab[i] = new VTaskControlWindow("empty slot", "00", "00");
 			
-
 		vTM.setModal(true);
 		vTM.setVisible(false);
+		database = new CoreManager();
 	
 	/**
 	 * VirtualTaskmasterMainWindow event handlers
@@ -84,6 +87,7 @@ public class VirtualTaskmaster {
 				int selRow = vTMW.tblToDo.getSelectedRow();
 				if(selRow != -1 && vTMW.tblToDo.getValueAt(selRow, 0) != null){			
 					((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
+					database.removeTaskByName((String) vTMW.tblToDo.getValueAt(vTMW.tblToDo.getSelectedRow(), 0));
 				}else{
 					JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
 				}
@@ -98,6 +102,7 @@ public class VirtualTaskmaster {
 					int min = VTasksManager.getHour((String) vTMW.tblToDo.getValueAt(selRow, 2),true);
 					handleVTCW(h,min,(String)vTMW.tblToDo.getValueAt(selRow, 0),(int)vTMW.tblToDo.getValueAt(selRow, 1));
 					((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
+					database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
 				}
 			}
 		});
@@ -107,25 +112,26 @@ public class VirtualTaskmaster {
 				vTM.rS = returnState.VTM_REJECTED;
 				vTM.setVisible(true);
 				
-				JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
-				int selRow = tbl.getSelectedRow();
 				if(vTM.rS == returnState.VTM_RUN){
-					if(selRow == -1)
-						selRow = VTasksManager.tblFindEmptyRow(tbl);
-					    handleVTCW(VTasksManager.getHour((String) tbl.getValueAt(selRow, 2),false),
-							   VTasksManager.getHour((String) tbl.getValueAt(selRow, 2),true),
-							   (String)tbl.getValueAt(selRow, 0),
-							   (int)(tbl.getValueAt(selRow, 1)));
+					if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
+		  				handleVTCW((int)vTM.spnr_hour.getValue(),
+						(int)vTM.spnr_mint.getValue(),
+					    vTM.textField.getText(),
+						(int)vTM.spnr_prior.getValue());
+					}else{
+						JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
+					}
 				}else if(vTM.rS == returnState.VTM_TODO){
-					if(selRow != -1 && tbl.getValueAt(selRow,0) != null){
+					if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
 						int eRow = VTasksManager.tblFindEmptyRow(vTMW.tblToDo);
 						((DefaultTableModel)vTMW.tblToDo.getModel()).addRow(new Object[]{null,null,null,null});
-						vTMW.tblToDo.setValueAt(tbl.getValueAt(selRow,0), eRow, 0);
-						vTMW.tblToDo.setValueAt(tbl.getValueAt(selRow,1), eRow, 1);
-						vTMW.tblToDo.setValueAt(tbl.getValueAt(selRow,2), eRow, 2);
-						vTMW.tblToDo.setValueAt(tbl.getValueAt(selRow,3), eRow, 3);
+						vTMW.tblToDo.setValueAt(vTM.textField.getText(), eRow, 0);
+						vTMW.tblToDo.setValueAt((int)vTM.spnr_prior.getValue(), eRow, 1);
+						vTMW.tblToDo.setValueAt(VTMainWindow.timeFiller((int)vTM.spnr_hour.getValue())+":"+
+											    VTMainWindow.timeFiller((int)vTM.spnr_mint.getValue()), eRow, 2);
+						vTMW.tblToDo.setValueAt("00:00", eRow, 3);
 					}else{
-						JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
+						JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
 					}	
 				}
 			}
@@ -191,6 +197,7 @@ public class VirtualTaskmaster {
 					((DefaultTableModel) vTM.tblFavourites.getModel()).addRow(new Object[]{null,null,null,null});
 					int row = VTasksManager.tblFindEmptyRow(vTM.tblFavourites);
 					int selRow = vTM.tblHistory.getSelectedRow();
+					vTM.tabEdit = true;
 					if(selRow != -1 && vTM.tblHistory.getValueAt(selRow, 0)!=null)
 					 {
 						vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,0), row, 0);
@@ -200,18 +207,15 @@ public class VirtualTaskmaster {
 					}else{
 						JOptionPane.showMessageDialog(new JFrame(), "You need to select a filled row.");
 					}
+					vTM.tabEdit = true;
 				}
 			}
 		});
 		vTM.btnRun.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
-				int selRow = tbl.getSelectedRow();
-				if(selRow != -1 && tbl.getValueAt(selRow, 0) != null){			
-					vTM.rS = returnState.VTM_RUN;
-					vTM.setVisible(false);
-				}	
+			public void mouseClicked(MouseEvent e) {	
+				vTM.rS = returnState.VTM_RUN;
+				vTM.setVisible(false);
 			}
 		});
 		vTM.btnToDo.addMouseListener(new MouseAdapter() {
@@ -226,34 +230,39 @@ public class VirtualTaskmaster {
 			public void mouseClicked(MouseEvent e) {
 				JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
 				int selRow = tbl.getSelectedRow();
+				vTM.tabEdit = true;
 				if(selRow == -1)
 					selRow = VTasksManager.tblFindEmptyRow(tbl);
 				if(tbl.getValueAt(selRow, 0) == null){
 					((DefaultTableModel) tbl.getModel()).addRow(new Object[]{null,null,null,null});
 				}
 				tbl.setValueAt(vTM.textField.getText(),selRow,0);
-				tbl.setValueAt(vTM.spinner.getValue(),selRow,1);
-				if((int)(vTM.spinner_2.getValue()) > 9){
-					tbl.setValueAt(vTM.spinner_1.getValue()+":"+vTM.spinner_2.getValue(),selRow,2);
+				tbl.setValueAt(vTM.spnr_prior.getValue(),selRow,1);
+				if((int)(vTM.spnr_mint.getValue()) > 9){
+					tbl.setValueAt(vTM.spnr_hour.getValue()+":"+vTM.spnr_mint.getValue(),selRow,2);
 				}
 				else{
-					tbl.setValueAt(vTM.spinner_1.getValue()+":0"+vTM.spinner_2.getValue(),selRow,2);					}					
+					tbl.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),selRow,2);				
 				}
+				vTM.tabEdit = false;
+			}
 		});
 		vTM.btnFromList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
 				int selRow = tbl.getSelectedRow();
+				vTM.tabEdit = true;
 				if(selRow != -1){			
 					vTM.textField.setText(tbl.getValueAt(selRow, 0).toString());
-					vTM.spinner.setValue(Integer.parseInt(tbl.getValueAt(selRow, 1).toString()));
+					vTM.spnr_prior.setValue(Integer.parseInt(tbl.getValueAt(selRow, 1).toString()));
 					String time = tbl.getValueAt(selRow, 2).toString();
-					vTM.spinner_1.setValue(VTasksManager.getHour(time,false));
-					vTM.spinner_2.setValue(VTasksManager.getHour(time,true));
+					vTM.spnr_hour.setValue(VTasksManager.getHour(time,false));
+					vTM.spnr_mint.setValue(VTasksManager.getHour(time,true));
 				}else{
 					JOptionPane.showMessageDialog(new JFrame(), "You need to select a row.");
 				}
+				vTM.tabEdit = false;
 			}
 		});
 	
@@ -498,5 +507,8 @@ public class VirtualTaskmaster {
 			int hour = Integer.parseInt(hours);
 			int min = Integer.parseInt(minutes);
 			return hour*3600000+min*60000;
+		}
+		boolean validateDataVTM(int h, int min, String name, String desc){
+			return ((h != 0 || min != 0) && !name.equals("") && !desc.equals(""));
 		}
 }
