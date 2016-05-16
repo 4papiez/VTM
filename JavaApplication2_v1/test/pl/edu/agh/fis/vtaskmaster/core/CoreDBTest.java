@@ -112,12 +112,13 @@ public class CoreDBTest {
      */
     @Test
     public void testUpdateExecutedTask() throws Exception {
-        fail("cos");
         System.out.println("updateExecutedTask");
-        ExecutedTask task = new ExecutedTask(1,"Test",1,1,1,true);
+        ExecutedTask etask = new ExecutedTask(1,"Test",1,1,1,true);
+        Task task = new Task("Test","",1,1,true,true);
         CoreDB instance = new CoreDB();
+        instance.addExecutedTask(task, 0);
         boolean expResult = true;
-        boolean result = instance.updateExecutedTask(task);
+        boolean result = instance.updateExecutedTask(etask);
         assertEquals(expResult, result);
         instance.closeConnection();
         System.out.println(" OK: Function passed all tests");
@@ -130,13 +131,13 @@ public class CoreDBTest {
     @Test
     public void testAddExecutedTask() throws Exception {
         System.out.println("addExecutedTask");
-        fail("cos");
         Task task = new Task("Test","Testing",1,1,true,true);
         long startTime = 0L;
         CoreDB instance = new CoreDB();
         boolean expResult = true;
         boolean result = instance.addExecutedTask(task, startTime);
         assertEquals(expResult, result);
+        instance.removeTaskByName("Test");
         instance.closeConnection();
         System.out.println(" OK: Function passed all tests");
     }
@@ -246,14 +247,15 @@ public class CoreDBTest {
     @Test
     public void testGetExecutedTask() throws Exception {
         System.out.println("getExecutedTask");
-        fail("");
         String name = "Test";
         CoreDB instance = new CoreDB();
-        ExecutedTask expResult = null;
+        Task task = new Task(name,"",1,1,true,true);
+        ExecutedTask expResult = new ExecutedTask(1,name,0,123,1234,true);
+        instance.addExecutedTask(task, 0);
         ExecutedTask result = instance.getExecutedTask(name);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.toString(), result.toString());
+        instance.removeTaskByName(name);
+        System.out.println(" OK: Function passed all tests");
     }
 
     /**
@@ -262,7 +264,7 @@ public class CoreDBTest {
     @Test
     public void testIsTaskWithName() throws Exception {
         System.out.println("isTaskWithName");
-        String taskName = "Dupa";
+        String taskName = "Test";
         CoreDB instance = new CoreDB();
         boolean expResult = true;
         boolean adding = instance.addTask(new Task(taskName,"",1,1,true,true));
@@ -271,6 +273,7 @@ public class CoreDBTest {
         assertEquals(expResult, result);
         result = instance.isTaskWithName(taskName);
         assertEquals(false, result);
+        instance.closeConnection();
         System.out.println(" OK: Function passed all tests");
         
     }
@@ -282,11 +285,15 @@ public class CoreDBTest {
     public void testGetAllExecutedTasks() throws Exception {
         System.out.println("getAllExecutedTasks");
         CoreDB instance = new CoreDB();
-        ArrayList<ExecutedTask> expResult = null;
+        String name = "Test";
+        ArrayList<ExecutedTask> expResult = new ArrayList(1);
+        expResult.add(new ExecutedTask(1,name,0,123,1234,true));
+        instance.addExecutedTask(new Task(name,"",1,1,true,true),0);
         ArrayList<ExecutedTask> result = instance.getAllExecutedTasks();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.get(0).toString(), result.toString());
+        instance.removeTaskByName(name);
+        instance.closeConnection();
+        System.out.println(" OK: Function passed all tests");  
     }
 
     /**

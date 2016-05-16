@@ -48,8 +48,7 @@ public class CoreManagerTest {
         System.out.println("finalize");
         CoreManager instance = new CoreManager();
         instance.finalize();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println(" OK: Function passed all tests"); 
     }
 
     /**
@@ -73,11 +72,13 @@ public class CoreManagerTest {
     public void testGetAllExecutedTasks() {
         System.out.println("getAllExecutedTasks");
         CoreManager instance = new CoreManager();
-        ArrayList<ExecutedTask> expResult = null;
+        ArrayList<ExecutedTask> expResult = new ArrayList(1);
+        expResult.add(new ExecutedTask(1,"",0,123456,1234567,true));
         ArrayList<ExecutedTask> result = instance.getAllExecutedTasks();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.get(0).toString(), result.get(0).toString());
+        instance.removeTaskByName("");
+        System.out.println(" OK: Function passed all tests");
+        
     }
 
     /**
@@ -131,11 +132,14 @@ public class CoreManagerTest {
     public void testGetTodo() {
         System.out.println("getTodo");
         CoreManager instance = new CoreManager();
-        ArrayList<Task> expResult = null;
+        instance.saveTask(new Task("","",1,1,true,true));
+        ArrayList<Task> expResult = new ArrayList(1);
+        expResult.add(new Task("","",1,1,true,true));
         ArrayList<Task> result = instance.getTodo();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.get(0).toString(), result.get(0).toString());
+        instance.removeTaskByName("");
+        System.out.println(" OK: Function passed all tests");
+        
     }
 
     /**
@@ -173,13 +177,13 @@ public class CoreManagerTest {
     @Test
     public void testSaveTask() {
         System.out.println("saveTask");
-        Task task = null;
+        Task task = new Task("","",1,1,true,true);
         CoreManager instance = new CoreManager();
-        boolean expResult = false;
+        boolean expResult = true;
         boolean result = instance.saveTask(task);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        instance.removeTaskByName("");
+        System.out.println(" OK: Function passed all tests"); 
     }
 
     /**
@@ -237,8 +241,7 @@ public class CoreManagerTest {
         System.out.println("main");
         String[] args = null;
         CoreManager.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
     }
     
 }
