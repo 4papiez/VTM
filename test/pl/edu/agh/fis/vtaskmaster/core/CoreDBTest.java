@@ -22,24 +22,18 @@ import pl.edu.agh.fis.vtaskmaster.core.model.Task;
  * @author Mateusz Papież
  */
 public class CoreDBTest {
-    
-    public CoreDBTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    // database instance which has to be initialized before each test case
+    private CoreDB db;
     
     @Before
     public void setUp() {
+        db = new CoreDB("test.db");
     }
     
     @After
     public void tearDown() {
+        db.clearDB();
+        db.closeConnection();
     }
 
     /**
@@ -47,12 +41,11 @@ public class CoreDBTest {
      */
     @Test
     public void testInitDB() {
-        System.out.println("initDB");
-        CoreDB instance = new CoreDB();
+        CoreDB instance = new CoreDB("testInit.db");
         boolean expResult = true;
         boolean result = instance.initDB();
+
         assertEquals(expResult, result);
-        System.out.println(" OK: Function passed all tests"); 
     }
 
     /**
@@ -61,15 +54,11 @@ public class CoreDBTest {
      */
     @Test
     public void testAddTask() throws Exception {
-        System.out.println("addTask");
-        Task task = new Task("Test","Testing task.",1,1,true,true);
-        CoreDB instance = new CoreDB();
+        Task task = new Task("Test", "Testing task.", 1, 1, true, true);
         boolean expResult = true;
-        boolean result = instance.addTask(task);
+        boolean result = db.addTask(task);
+
         assertEquals(expResult, result);
-        result = instance.removeTaskByName("Test");
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests"); 
     }
 
     /**
@@ -78,15 +67,12 @@ public class CoreDBTest {
      */
     @Test
     public void testRemoveTaskByName() throws Exception {
-        System.out.println("removeTaskByName");
-        String taskName = "";
-        CoreDB instance = new CoreDB();
+        String taskName = "Test";
         boolean expResult = false;
-        boolean result = instance.addTask(new Task("","",1,1,true,true));
-        result = instance.removeTaskByName(taskName);
+        db.addTask(new Task(taskName, "", 1, 1, true, true));
+        boolean result = db.removeTaskByName(taskName);
+
         assertEquals(expResult, result);
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
     }
 
     /**
@@ -95,16 +81,14 @@ public class CoreDBTest {
      */
     @Test
     public void testUpdateTask() throws Exception {
-        System.out.println("updateTask");
-        Task task = new Task ("Test","Poprawiony",1,1,true,true);
-        CoreDB instance = new CoreDB();
+        Task task = new Task ("Test", "Poprawiony", 1, 1, true, true);
         boolean expResult = true;
-        boolean result = instance.addTask(new Task("Test","",0,0,false,false));
-        result = instance.updateTask(task);
+        db.addTask(new Task("Test", "", 0, 0, false, false));
+        task.setName("New name");
+
+        boolean result = db.updateTask(task);
+
         assertEquals(expResult, result);
-        result = instance.removeTaskByName("Test");
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
     }
 
     /**
@@ -113,17 +97,15 @@ public class CoreDBTest {
      */
     @Test
     public void testUpdateExecutedTask() throws Exception {
-        System.out.println("updateExecutedTask");
-        ExecutedTask etask = new ExecutedTask(1,"Test",1,1,1,true);
-        Task task = new Task("Test","",1,1,true,true);
-        CoreDB instance = new CoreDB();
-        instance.addExecutedTask(task, 0);
+        ExecutedTask etask = new ExecutedTask(1, "Test", 1, 1, 1, true);
+        Task task = new Task("Test", "", 1, 1, true, true);
+        db.addTask(task);
+        db.addExecutedTask(task, 0);
+        etask.setElapsedTime(15);
         boolean expResult = true;
-        boolean result = instance.updateExecutedTask(etask);
+        boolean result = db.updateExecutedTask(etask);
+
         assertEquals(expResult, result);
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
-        
     }
 
     /**
@@ -131,16 +113,13 @@ public class CoreDBTest {
      */
     @Test
     public void testAddExecutedTask() throws Exception {
-        System.out.println("addExecutedTask");
-        Task task = new Task("Test","Testing",1,1,true,true);
-        long startTime = 0L;
-        CoreDB instance = new CoreDB();
+        Task task = new Task("Test", "Testing", 1, 1, true, true);
         boolean expResult = true;
-        boolean result = instance.addExecutedTask(task, startTime);
+
+        db.addTask(task);
+        boolean result = db.addExecutedTask(task, 25);
+
         assertEquals(expResult, result);
-        instance.removeTaskByName("Test");
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
     }
 
     /**
@@ -148,23 +127,18 @@ public class CoreDBTest {
      */
     @Test
     public void testGetTodo() throws Exception {
-        System.out.println("getTodo");
-        CoreDB instance = new CoreDB();
-        ArrayList<Task> expResult = new ArrayList<Task>(2);
-        boolean adding = expResult.add(new Task("Test","Poprawiony",1,1,true,true));
-        adding = expResult.add(new Task("","Poprawiony",1,1,true,true));
-        adding = instance.addTask(new Task("Test","Poprawiony",1,1,true,true));
-        adding = instance.addTask(new Task("","Poprawiony",1,1,true,true));
-        ArrayList<Task> result = instance.getTodo();
-        adding = instance.removeTaskByName("");
-        adding = instance.removeTaskByName("Test");
-        for (int i=0;i<2;i++){ 
-            assertEquals(expResult.get(i).toString(), result.get(i).toString());
-        }
-        
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
-        
+        ArrayList<Task> expResult = new ArrayList<>(2);
+        expResult.add(new Task("Test", "", 1, 1, true, true));
+        expResult.add(new Task("Test2", "", 1, 1, true, true));
+
+        db.addTask(new Task("Test", "", 1, 1, true, true));
+        db.addTask(new Task("Test2", "", 1, 1, true, true));
+
+        ArrayList<Task> result = db.getTodo();
+
+
+        assertEquals(expResult.get(0).toString(), result.get(0).toString());
+        assertEquals(expResult.get(1).toString(), result.get(1).toString());
     }
 
     /**
@@ -172,21 +146,20 @@ public class CoreDBTest {
      */
     @Test
     public void testGetFavourites() throws Exception {
-        System.out.println("getFavourites");
-        CoreDB instance = new CoreDB();
-        ArrayList<Task> expResult = new ArrayList<Task>(2);
-        boolean adding = expResult.add(new Task("Test","Poprawiony",1,1,true,true));
-        adding = expResult.add(new Task("","Poprawiony",1,1,true,true));
-        adding = instance.addTask(new Task("Test","Poprawiony",1,1,true,true));
-        adding = instance.addTask(new Task("","Poprawiony",1,1,true,true));
-        ArrayList<Task> result = instance.getFavourites();
-        adding = instance.removeTaskByName("");
-        adding = instance.removeTaskByName("Test");
-        for (int i=0;i<2;i++){ 
-            assertEquals(expResult.get(i).toString(), result.get(i).toString());
-        }
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
+
+        ArrayList<Task> expResult = new ArrayList<>(2);
+        expResult.add(new Task("Test", "Poprawiony", 1, 1, true, true));
+        expResult.add(new Task("", "Poprawiony",1,1,true,true));
+
+        db.addTask(new Task("Test", "Poprawiony", 1, 1, true, true));
+        db.addTask(new Task("", "Poprawiony", 1, 1, true, true));
+        db.addTask(new Task("Test not fav", "", 1, 1, false, true));
+
+        ArrayList<Task> result = db.getFavourites();
+
+        assertEquals(result.size(), 2);
+        assertEquals(expResult.get(0).toString(), result.get(0).toString());
+        assertEquals(expResult.get(1).toString(), result.get(1).toString());
     }
 
     /**
@@ -194,21 +167,17 @@ public class CoreDBTest {
      */
     @Test
     public void testGetAllTasks() throws Exception {
-        System.out.println("getAllTasks");
-        CoreDB instance = new CoreDB();
-        ArrayList<Task> expResult = new ArrayList<Task>(2);
-        boolean adding = expResult.add(new Task("Test","Poprawiony",1,1,true,true));
-        adding = expResult.add(new Task("","Poprawiony",1,1,true,true));
-        adding = instance.addTask(new Task("Test","Poprawiony",1,1,true,true));
-        adding = instance.addTask(new Task("","Poprawiony",1,1,true,true));
-        ArrayList<Task> result = instance.getAllTasks();
-        adding = instance.removeTaskByName("");
-        adding = instance.removeTaskByName("Test");
-        for (int i=0;i<2;i++){ 
-            assertEquals(expResult.get(i).toString(), result.get(i).toString());
-        }
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
+        ArrayList<Task> expResult = new ArrayList<>(2);
+        expResult.add(new Task("Test", "Poprawiony", 1, 1, true, true));
+        expResult.add(new Task("","Poprawiony",1,1,true,true));
+
+        db.addTask(new Task("Test","Poprawiony",1,1,true,true));
+        db.addTask(new Task("","Poprawiony",1,1,true,true));
+
+        ArrayList<Task> result = db.getAllTasks();
+
+        assertEquals(expResult.get(0).toString(), result.get(0).toString());
+        assertEquals(expResult.get(1).toString(), result.get(1).toString());
     }
 
     /**
@@ -216,13 +185,10 @@ public class CoreDBTest {
      */
     @Test
     public void testGetHistory() throws Exception {
-        System.out.println("getHistory");
-        CoreDB instance = new CoreDB();
-        ArrayList<Task> expResult =new ArrayList<Task>(0);
-        ArrayList<Task> result = instance.getHistory();
+        ArrayList<Task> expResult = new ArrayList<>(0);
+        ArrayList<Task> result = db.getHistory();
+
         assertEquals(expResult, result);
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests"); 
     }
 
     /**
@@ -230,55 +196,31 @@ public class CoreDBTest {
      */
     @Test
     public void testGetTaskByName() throws Exception {
-        System.out.println("getTaskByName");
         String name = "Test";
-        CoreDB instance = new CoreDB();
-        Task expResult = new Task("Test","Poprawiony",1,1,true,true);
-        boolean adding = instance.addTask(expResult);
-        Task result = instance.getTaskByName(name);
+        Task expResult = new Task("Test", "", 1, 1, true, true);
+        db.addTask(expResult);
+
+        Task result = db.getTaskByName(name);
+
         assertEquals(expResult.toString(), result.toString());
-        adding = instance.removeTaskByName(name);
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
     }
 
-    /**
-     * Test of getExecutedTask method, of class CoreDB.
-     */
-    @Test
-    public void testGetExecutedTask() throws Exception {
-        /*
-    	System.out.println("getExecutedTask");
-        String name = "Test";
-        CoreDB instance = new CoreDB();
-        Task task = new Task(name,"",1,1,true,true);
-        ExecutedTask expResult = new ExecutedTask(1,name,0,123,1234,true);
-        instance.addExecutedTask(task, 0);
-        ExecutedTask result = instance.getExecutedTask(name);
-        assertEquals(expResult.toString(), result.toString());
-        instance.removeTaskByName(name);
-        System.out.println(" OK: Function passed all tests");
-        */
-    }
 
     /**
      * Test of isTaskWithName method, of class CoreDB.
      */
     @Test
     public void testIsTaskWithName() throws Exception {
-        System.out.println("isTaskWithName");
         String taskName = "Test";
-        CoreDB instance = new CoreDB();
         boolean expResult = true;
-        boolean adding = instance.addTask(new Task(taskName,"",1,1,true,true));
-        boolean result = instance.isTaskWithName(taskName);
-        adding = instance.removeTaskByName(taskName);
+
+        db.addTask(new Task(taskName, "" ,1, 1, true, true));
+        boolean result = db.isTaskWithName(taskName);
+
         assertEquals(expResult, result);
-        result = instance.isTaskWithName(taskName);
+
+        result = db.isTaskWithName("Not such task");
         assertEquals(false, result);
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
-        
     }
 
     /**
@@ -286,17 +228,22 @@ public class CoreDBTest {
      */
     @Test
     public void testGetAllExecutedTasks() throws Exception {
-        System.out.println("getAllExecutedTasks");
-        CoreDB instance = new CoreDB();
-        String name = "Test";
-        ArrayList<ExecutedTask> expResult = new ArrayList(1);
-        expResult.add(new ExecutedTask(1,name,0,123,1234,true));
-        instance.addExecutedTask(new Task(name,"",1,1,true,true),0);
-        ArrayList<ExecutedTask> result = instance.getAllExecutedTasks();
-        assertEquals(expResult.get(0).toString(), result.toString());
-        instance.removeTaskByName(name);
-        instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");  
+        Task task1 = new Task("Test1", "", 1, 1, true, true);
+        Task task2 = new Task("Test2", "", 1, 1, true, true);
+
+        ArrayList<ExecutedTask> expResult = new ArrayList<>(2);
+        expResult.add(new ExecutedTask(1, "Test1", 0, 0, 0, false));
+        expResult.add(new ExecutedTask(2, "Test2", 0, 0, 0, false));
+
+        db.addTask(task1);
+        db.addTask(task2);
+        db.addExecutedTask(task1, 0);
+        db.addExecutedTask(task2, 0);
+
+        ArrayList<ExecutedTask> result = db.getAllExecutedTasks();
+
+        assertEquals(expResult.get(0).toString(), result.get(0).toString());
+        assertEquals(expResult.get(1).toString(), result.get(1).toString());
     }
 
     /**
@@ -304,22 +251,8 @@ public class CoreDBTest {
      */
     @Test
     public void testCloseConnection() {
-        System.out.println("closeConnection");
-        CoreDB instance = new CoreDB();
+        CoreDB instance = new CoreDB("test.db");
+        instance.clearDB();
         instance.closeConnection();
-        System.out.println(" OK: Function passed all tests");
-        
     }
-
-    /**
-     * Test of main method, of class CoreDB.
-     */
-    @Test
-    public void testMain() {
-        System.out.println("main");
-        String[] args = null;
-        CoreDB.main(args);
-        System.out.println(" OK: Function passed all tests");
-    }
-    
 }

@@ -97,8 +97,8 @@ public class CoreDB {
     }
 
     public boolean clearDB() {
-        String dropTasks = "DROP TABLE tasks";
-        String dropExecutedTasks = "DROP TABLE executedTasks";
+        String dropTasks = "DROP TABLE IF EXISTS tasks";
+        String dropExecutedTasks = "DROP TABLE IF EXISTS executedTasks";
 
         try {
             statement.execute(dropExecutedTasks);
