@@ -96,6 +96,22 @@ public class CoreDB {
         return true;
     }
 
+    public boolean clearDB() {
+        String dropTasks = "DROP TABLE tasks";
+        String dropExecutedTasks = "DROP TABLE executedTasks";
+
+        try {
+            statement.execute(dropExecutedTasks);
+            statement.execute(dropTasks);
+        }
+        catch(SQLException e) {
+            System.err.println("Blad w trakcie czyszczenia tabel");
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public boolean addTask(Task task) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO tasks VALUES (?, ?, ?, ?, ?, ?)"
@@ -112,7 +128,7 @@ public class CoreDB {
     }
 
     public boolean removeTaskByName(String taskName) throws SQLException {
-        return statement.execute("DELETE FROM tasks WHERE name=" + taskName);
+        return statement.execute("DELETE FROM tasks WHERE name='" + taskName + "'");
     }
 
     public boolean updateTask(Task task) throws SQLException {
@@ -140,7 +156,6 @@ public class CoreDB {
                         "WHERE id = ?"
         );
 
-
         statement.setLong(1, task.getElapsedTime());
         statement.setInt(2, task.getId());
 
@@ -153,6 +168,7 @@ public class CoreDB {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
         );
+
         preparedStatement.setString(1, task.getName());
         preparedStatement.setLong(2, startTime);
         preparedStatement.setLong(3, 0);
@@ -207,7 +223,7 @@ public class CoreDB {
     }
 
     Task getTaskByName(String name) throws SQLException {
-        int id, priority;
+        int priority;
         boolean favourite, todo;
         String description;
         long expectedTime;
@@ -234,8 +250,11 @@ public class CoreDB {
     }
 
     public boolean isTaskWithName(String taskName) throws SQLException {
-        ResultSet result = statement.executeQuery("SELECT * FROM tasks WHERE name = '" + taskName + "'");
-        return result.getFetchSize() == 1;
+        ResultSet result = statement.executeQuery(
+                "SELECT 1 FROM tasks WHERE name = '" + taskName + "'"
+        );
+
+        return result.next();
     }
 
     public ArrayList<ExecutedTask> getAllExecutedTasks() throws SQLException {
@@ -270,38 +289,4 @@ public class CoreDB {
             e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        CoreDB db = new CoreDB();
-        //db.addTask("kupic chleb", "wazne zadanie", 1, 500, true, false);
-        //db.addTask("kupic maslo", "wazne niesamowicie zadanie", 1, 500, true, false);
-        //db.addTask("sprzedac koniaszka", "wazne bardzo zadanie", 1, 500, false, false);
-        try {
-            db.getAllTasks().forEach(System.out::println);
-            System.out.println("_______");
-
-            Task myTask = db.getTaskByName("kupic chleb");
-            if (myTask != null) {
-                myTask.setName("zmienic bieg");
-                myTask.setDescription("szybko i sprawnie");
-                db.updateTask(myTask);
-            }
-            db.getAllTasks().forEach(System.out::println);
-
-            db.getAllExecutedTasks().forEach(System.out::println);
-            ExecutedTask myExecutedTask = db.getAllExecutedTasks().get(0);
-            if (myExecutedTask != null) {
-                myExecutedTask.setElapsedTime(600);
-                db.updateExecutedTask(myExecutedTask);
-            }
-            db.getAllExecutedTasks().forEach(System.out::println);
-
-
-        }
-        catch (SQLException e) {
-
-        }
-
-    }
-
 }
