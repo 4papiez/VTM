@@ -224,6 +224,10 @@ public class CoreManager {
         task.setEndTime(endTime);
         return updateExecutedTask(task);
     }
+    
+    public boolean cleardb(){
+        return db.clearDB();
+    }
 
 
     public static void main(String[] args) {
