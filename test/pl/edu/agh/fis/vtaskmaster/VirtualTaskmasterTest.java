@@ -17,7 +17,7 @@ import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 
 /**
  *
- * @author Admin2
+ * @author Mateusz Papież
  */
 public class VirtualTaskmasterTest {
     
@@ -48,8 +48,7 @@ public class VirtualTaskmasterTest {
         System.out.println("main");
         String[] args = null;
         VirtualTaskmaster.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**
@@ -61,11 +60,10 @@ public class VirtualTaskmasterTest {
         int h = 0;
         int min = 0;
         String task = "";
-        int prior = 0;
+        int prior = 1;
         VirtualTaskmaster instance = new VirtualTaskmaster();
         instance.handleVTCW(h, min, task, prior);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**
@@ -74,14 +72,14 @@ public class VirtualTaskmasterTest {
     @Test
     public void testCountDownTime() {
         System.out.println("countDownTime");
+        fail("This is prototype!");
         int winIndx = 0;
         boolean retHourTxt = false;
         VirtualTaskmaster instance = new VirtualTaskmaster();
-        String expResult = "";
+        String expResult = "0-224409787";
         String result = instance.countDownTime(winIndx, retHourTxt);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**
@@ -90,14 +88,13 @@ public class VirtualTaskmasterTest {
     @Test
     public void testElapsedTimeCalc() {
         System.out.println("elapsedTimeCalc");
-        String hours = "";
-        String minutes = "";
+        String hours = "3";
+        String minutes = "5";
         VirtualTaskmaster instance = new VirtualTaskmaster();
-        int expResult = 0;
+        int expResult = 11100000;
         int result = instance.elapsedTimeCalc(hours, minutes);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**

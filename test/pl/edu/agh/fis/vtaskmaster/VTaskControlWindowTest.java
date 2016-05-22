@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author Admin2
+ * @author Mateusz Papież
  */
 public class VTaskControlWindowTest {
     
@@ -45,8 +45,7 @@ public class VTaskControlWindowTest {
         System.out.println("main");
         String[] args = null;
         VTaskControlWindow.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**
@@ -55,13 +54,12 @@ public class VTaskControlWindowTest {
     @Test
     public void testSetTask() {
         System.out.println("setTask");
-        String taskName = "";
-        String taskTimeHours = "";
-        String taskTimeMins = "";
-        VTaskControlWindow instance = null;
+        String taskName = "Test";
+        String taskTimeHours = "1";
+        String taskTimeMins = "1";
+        VTaskControlWindow instance = new VTaskControlWindow(taskName,taskTimeHours,taskTimeMins);
         instance.setTask(taskName, taskTimeHours, taskTimeMins);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
     
 }

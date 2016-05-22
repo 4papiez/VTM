@@ -17,9 +17,13 @@ import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 
 /**
  *
- * @author Admin2
+ * @author Mateusz Papież
  */
 public class CoreManagerTest {
+    /** Instance which has to be initialized before each test case */
+    private CoreManager instance;
+    /** Name of the testing instance */
+    private final static String NAME="TEST";
     
     public CoreManagerTest() {
     }
@@ -45,10 +49,10 @@ public class CoreManagerTest {
      */
     @Test
     public void testFinalize() {
-        System.out.println("finalize");
-        CoreManager instance = new CoreManager();
+        System.out.println("Finalize()");
+        instance = new CoreManager(NAME);
         instance.finalize();
-        System.out.println(" OK: Function passed all tests"); 
+        System.out.println(" PASSED");
     }
 
     /**
@@ -56,13 +60,16 @@ public class CoreManagerTest {
      */
     @Test
     public void testGetAllTasks() {
-        System.out.println("getAllTasks");
-        CoreManager instance = new CoreManager();
-        ArrayList<Task> expResult = null;
+        System.out.println("GetAllTasks()");
+        instance= new CoreManager (NAME);
+        Task task = new Task("Test","",1,1,true,true);
+        ArrayList<Task> expResult= new ArrayList();
+        expResult.add(task);
+        instance.saveTask(task);
         ArrayList<Task> result = instance.getAllTasks();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.toString(), result.toString());
+        instance.cleardb();
+        System.out.println(" PASSED");
     }
 
     /**
@@ -71,31 +78,17 @@ public class CoreManagerTest {
     @Test
     public void testGetAllExecutedTasks() {
         System.out.println("getAllExecutedTasks");
-        CoreManager instance = new CoreManager();
+        instance = new CoreManager(NAME);
         ArrayList<ExecutedTask> expResult = new ArrayList(1);
-        expResult.add(new ExecutedTask(1,"",0,123456,1234567,true));
+        expResult.add(new ExecutedTask(1,"Test",0,0,0,false));
+        Task task = new Task("Test","",1,1,true,true);
+        instance.saveTask(task);
+        instance.executeTask(task, 0);
         ArrayList<ExecutedTask> result = instance.getAllExecutedTasks();
         assertEquals(expResult.get(0).toString(), result.get(0).toString());
-        instance.removeTaskByName("");
-        System.out.println(" OK: Function passed all tests");
+        instance.cleardb();
+        System.out.println(" PASSED ");
         
-    }
-
-    /**
-     * Test of getExecutedTask method, of class CoreManager.
-     */
-    @Test
-    public void testGetExecutedTask() {
-        /*
-    	System.out.println("getExecutedTask");
-        String name = "";
-        CoreManager instance = new CoreManager();
-        ExecutedTask expResult = null;
-        ExecutedTask result = instance.getExecutedTask(name);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-        */
     }
 
     /**
@@ -104,13 +97,14 @@ public class CoreManagerTest {
     @Test
     public void testGetTaskByName() {
         System.out.println("getTaskByName");
-        String taskName = "";
-        CoreManager instance = new CoreManager();
-        Task expResult = null;
+        String taskName = "Test";
+        Task expResult = new Task(taskName,"",1,1,true,true);
+        instance = new CoreManager(NAME);
+        instance.saveTask(expResult);
         Task result = instance.getTaskByName(taskName);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.toString(), result.toString());
+        instance.cleardb();
+        System.out.println(" PASSED");
     }
 
     /**
@@ -119,12 +113,17 @@ public class CoreManagerTest {
     @Test
     public void testGetFavourites() {
         System.out.println("getFavourites");
-        CoreManager instance = new CoreManager();
-        ArrayList<Task> expResult = null;
+        ArrayList<Task> expResult = new ArrayList();
+        Task one = new Task("Test1","",1,1,true,true);
+        Task two = new Task("Test2","",0,0,false,false);
+        instance = new CoreManager(NAME);
+        expResult.add(one);
+        instance.saveTask(one);
+        instance.saveTask(two);
         ArrayList<Task> result = instance.getFavourites();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.toString(), result.toString());
+        instance.cleardb();
+        System.out.println("PASSED");
     }
 
     /**
@@ -133,14 +132,17 @@ public class CoreManagerTest {
     @Test
     public void testGetTodo() {
         System.out.println("getTodo");
-        CoreManager instance = new CoreManager();
-        instance.saveTask(new Task("","",1,1,true,true));
+        Task one = new Task("Test1","",1,1,true,true);
+        Task two = new Task("Test2","",0,0,false,false);
+        instance = new CoreManager(NAME);
+        instance.saveTask(one);
+        instance.saveTask(two);
         ArrayList<Task> expResult = new ArrayList(1);
-        expResult.add(new Task("","",1,1,true,true));
+        expResult.add(one);
         ArrayList<Task> result = instance.getTodo();
-        assertEquals(expResult.get(0).toString(), result.get(0).toString());
-        instance.removeTaskByName("");
-        System.out.println(" OK: Function passed all tests");
+        assertEquals(expResult.toString(), result.toString());
+        instance.cleardb();
+        System.out.println(" PASSED");
         
     }
 
@@ -150,12 +152,24 @@ public class CoreManagerTest {
     @Test
     public void testGetHistory() {
         System.out.println("getHistory");
-        CoreManager instance = new CoreManager();
-        ArrayList<Task> expResult = null;
+        instance = new CoreManager(NAME);
+        Task one = new Task("Test1","",1,1,true,true);
+        Task two = new Task ("Test 2","",0,0,false,false);
+        ExecutedTask eone = new ExecutedTask(1,"Test1" ,0,0,0,true);
+        ExecutedTask etwo = new ExecutedTask(2,"Test 2" ,0,0,0,true);
+        ArrayList<Task> expResult = new ArrayList();
+        expResult.add(one);
+        expResult.add(two);
+        instance.saveTask(two);
+        instance.saveTask(one);
+        instance.executeTask(one, 0);
+        instance.executeTask(two, 0);
+        instance.finishTask(etwo, 0);
+        instance.finishTask(eone, 0);
         ArrayList<Task> result = instance.getHistory();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(expResult.toString(), result.toString());
+        instance.cleardb();
+        System.out.println(" PASSED");
     }
 
     /**
@@ -164,13 +178,13 @@ public class CoreManagerTest {
     @Test
     public void testRemoveTaskByName() {
         System.out.println("removeTaskByName");
-        String taskName = "";
-        CoreManager instance = new CoreManager();
-        boolean expResult = false;
+        String taskName = "Test";
+        instance = new CoreManager(NAME);
+        instance.saveTask(new Task(taskName,"",1,1,true,true));
+        boolean expResult = true;
         boolean result = instance.removeTaskByName(taskName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println(" PASSED");
     }
 
     /**
@@ -179,13 +193,13 @@ public class CoreManagerTest {
     @Test
     public void testSaveTask() {
         System.out.println("saveTask");
-        Task task = new Task("","",1,1,true,true);
-        CoreManager instance = new CoreManager();
+        Task task = new Task("Test","",1,1,true,true);
+        CoreManager instance = new CoreManager(NAME);
         boolean expResult = true;
         boolean result = instance.saveTask(task);
         assertEquals(expResult, result);
-        instance.removeTaskByName("");
-        System.out.println(" OK: Function passed all tests"); 
+        instance.cleardb();
+        System.out.println(" PASSED"); 
     }
 
     /**
@@ -194,14 +208,15 @@ public class CoreManagerTest {
     @Test
     public void testExecuteTask() {
         System.out.println("executeTask");
-        Task task = null;
+        instance = new CoreManager(NAME);
+        Task task = new Task("Test","",1,1,true,true);
         long startTime = 0L;
-        CoreManager instance = new CoreManager();
-        boolean expResult = false;
+        boolean expResult = true;
+        instance.saveTask(task);
         boolean result = instance.executeTask(task, startTime);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        instance.cleardb();
+        System.out.println(" PASSED ");
     }
 
     /**
@@ -210,13 +225,17 @@ public class CoreManagerTest {
     @Test
     public void testUpdateExecutedTask() {
         System.out.println("updateExecutedTask");
-        ExecutedTask task = null;
-        CoreManager instance = new CoreManager();
-        boolean expResult = false;
-        boolean result = instance.updateExecutedTask(task);
+        instance = new CoreManager(NAME);
+        Task task = new Task ("Test", "" ,1,1,true,true);
+        ExecutedTask etask = new ExecutedTask (1,"Test",0,0,0,false);
+        boolean expResult = true;
+        instance.saveTask(task);
+        instance.executeTask(task, 0);
+        boolean result = instance.updateExecutedTask(etask);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        instance.cleardb();
+        System.out.println(" PASSED");
+    
     }
 
     /**
@@ -225,14 +244,23 @@ public class CoreManagerTest {
     @Test
     public void testFinishTask() {
         System.out.println("finishTask");
-        ExecutedTask task = null;
+        ExecutedTask etask = new ExecutedTask(1,"Test",0,0,0,false);
+        Task task = new Task("Test","",1,1,true,true);
         long endTime = 0L;
-        CoreManager instance = new CoreManager();
-        boolean expResult = false;
-        boolean result = instance.finishTask(task, endTime);
+        instance = new CoreManager(NAME);
+        instance.saveTask(task);
+        instance.executeTask(task, 0);
+        boolean expResult = true;
+        boolean result = instance.finishTask(etask, endTime);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ArrayList<ExecutedTask> real = instance.getAllExecutedTasks();
+        ArrayList<ExecutedTask> expected = new ArrayList();
+        expected.add(new ExecutedTask(1,"Test",0,0,0,true));
+        System.out.println(expected);
+        System.out.println(real);
+        assertEquals(expected.toString(), real.toString());
+        instance.cleardb();
+        System.out.println(" PASSED");
     }
 
     /**
@@ -243,7 +271,21 @@ public class CoreManagerTest {
         System.out.println("main");
         String[] args = null;
         CoreManager.main(args);
+        System.out.println(" PASSED");
         
+    }
+
+    /**
+     * Test of cleardb method, of class CoreManager.
+     */
+    @Test
+    public void testCleardb() {
+        System.out.println("cleardb");
+        instance = new CoreManager(NAME);
+        boolean expResult = true;
+        boolean result = instance.cleardb();
+        assertEquals(expResult, result);
+        System.out.println(" PASSED");
     }
     
 }

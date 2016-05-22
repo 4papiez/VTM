@@ -24,6 +24,14 @@ import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 public class CoreDBTest {
     // database instance which has to be initialized before each test case
     private CoreDB db;
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
     
     @Before
     public void setUp() {
@@ -57,7 +65,6 @@ public class CoreDBTest {
         Task task = new Task("Test", "Testing task.", 1, 1, true, true);
         boolean expResult = true;
         boolean result = db.addTask(task);
-
         assertEquals(expResult, result);
     }
 
@@ -71,13 +78,12 @@ public class CoreDBTest {
         boolean expResult = false;
         db.addTask(new Task(taskName, "", 1, 1, true, true));
         boolean result = db.removeTaskByName(taskName);
-
         assertEquals(expResult, result);
     }
 
     /**
      * Test of updateTask method, of class CoreDB.
-     * throws java.lang.Exception
+     * @throws java.lang.Exception
      */
     @Test
     public void testUpdateTask() throws Exception {
@@ -93,7 +99,7 @@ public class CoreDBTest {
 
     /**
      * Test of updateExecutedTask method, of class CoreDB.
-     * throws java.lang.Exception;
+     * @throws java.lang.Exception;
      */
     @Test
     public void testUpdateExecutedTask() throws Exception {
@@ -110,6 +116,7 @@ public class CoreDBTest {
 
     /**
      * Test of addExecutedTask method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testAddExecutedTask() throws Exception {
@@ -124,6 +131,7 @@ public class CoreDBTest {
 
     /**
      * Test of getTodo method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetTodo() throws Exception {
@@ -143,6 +151,7 @@ public class CoreDBTest {
 
     /**
      * Test of getFavourites method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetFavourites() throws Exception {
@@ -164,6 +173,7 @@ public class CoreDBTest {
 
     /**
      * Test of getAllTasks method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetAllTasks() throws Exception {
@@ -182,6 +192,7 @@ public class CoreDBTest {
 
     /**
      * Test of getHistory method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetHistory() throws Exception {
@@ -193,6 +204,7 @@ public class CoreDBTest {
 
     /**
      * Test of getTaskByName method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetTaskByName() throws Exception {
@@ -208,6 +220,7 @@ public class CoreDBTest {
 
     /**
      * Test of isTaskWithName method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testIsTaskWithName() throws Exception {
@@ -225,6 +238,7 @@ public class CoreDBTest {
 
     /**
      * Test of getAllExecutedTasks method, of class CoreDB.
+     * @throws java.lang.Exception
      */
     @Test
     public void testGetAllExecutedTasks() throws Exception {
@@ -254,5 +268,16 @@ public class CoreDBTest {
         CoreDB instance = new CoreDB("test.db");
         instance.clearDB();
         instance.closeConnection();
+    }
+
+    /**
+     * Test of clearDB method, of class CoreDB.
+     */
+    @Test
+    public void testClearDB() {
+        CoreDB instance = new CoreDB();
+        boolean expResult = true;
+        boolean result = instance.clearDB();
+        assertEquals(expResult, result);
     }
 }

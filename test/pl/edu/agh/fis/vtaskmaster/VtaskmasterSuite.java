@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
 
 /**
  *
- * @author Admin2
+ * @author Mateusz Papież
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({pl.edu.agh.fis.vtaskmaster.VirtualTaskmasterTest.class, pl.edu.agh.fis.vtaskmaster.core.CoreSuite.class, pl.edu.agh.fis.vtaskmaster.VTasksManagerTest.class, pl.edu.agh.fis.vtaskmaster.VTaskControlWindowTest.class, pl.edu.agh.fis.vtaskmaster.VTMainWindowTest.class})

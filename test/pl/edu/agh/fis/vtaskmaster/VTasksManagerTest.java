@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author Admin2
+ * @author Mateusz Papież
  */
 public class VTasksManagerTest {
     
@@ -46,8 +46,7 @@ public class VTasksManagerTest {
         System.out.println("main");
         String[] args = null;
         VTasksManager.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**
@@ -56,12 +55,12 @@ public class VTasksManagerTest {
     @Test
     public void testTblFindEmptyRow() {
         System.out.println("tblFindEmptyRow");
-        JTable tbl = null;
+        VTasksManager vtm = new VTasksManager();
+        JTable tbl = vtm.tblFavourites;
         int expResult = 0;
         int result = VTasksManager.tblFindEmptyRow(tbl);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("PASSED");
     }
 
     /**
@@ -70,13 +69,30 @@ public class VTasksManagerTest {
     @Test
     public void testGetHour() {
         System.out.println("getHour");
-        String time = "";
+        String time = "12";
         boolean minute = false;
         int expResult = 0;
         int result = VTasksManager.getHour(time, minute);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        time = "1234";
+        result = VTasksManager.getHour(time, minute);
+        expResult = 1;
+        assertEquals(expResult, result);
+        time = "1234";
+        minute = true;
+        result = VTasksManager.getHour(time, minute);
+        expResult = 34 ;
+        assertEquals(expResult, result);
+        time = "12345";
+        expResult = 45;
+        result = VTasksManager.getHour(time, minute);
+        assertEquals(expResult, result);
+        time = "12345";
+        minute = false;
+        expResult = 12;
+        result = VTasksManager.getHour(time, minute);
+        assertEquals(expResult, result);
+        System.out.println("PASSED");
     }
     
 }
