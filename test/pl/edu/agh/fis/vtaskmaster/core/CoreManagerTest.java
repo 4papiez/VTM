@@ -24,24 +24,16 @@ public class CoreManagerTest {
     private CoreManager instance;
     /** Name of the testing instance */
     private final static String NAME="TEST";
-    
-    public CoreManagerTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
+
     @Before
     public void setUp() {
+        instance = new CoreManager("test.db");
     }
     
     @After
     public void tearDown() {
+        instance.cleardb();
+        instance.finalize();
     }
 
     /**
@@ -287,5 +279,6 @@ public class CoreManagerTest {
         assertEquals(expResult, result);
         System.out.println(" PASSED");
     }
+
     
 }
