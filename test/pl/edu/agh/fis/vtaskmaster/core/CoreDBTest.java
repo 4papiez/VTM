@@ -5,6 +5,7 @@
  */
 package pl.edu.agh.fis.vtaskmaster.core;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.lang.*;
 import org.junit.After;
@@ -280,4 +281,25 @@ public class CoreDBTest {
         boolean result = instance.clearDB();
         assertEquals(expResult, result);
     }
+
+    /**
+     * Checks if ExecutedTasks delete when we delete their Task
+     */
+    @Test
+    public void testAfterDeletingTaskExecutedTasksDeleteAsWell()
+            throws SQLException
+    {
+        Task task = new Task("Test", "test", 1, 1, true, true);
+        db.addTask(task);
+        db.addExecutedTask(task, 0);
+        db.addExecutedTask(task, 6);
+
+        assertTrue(db.getAllExecutedTasks().size() == 2);
+
+        db.removeTaskByName("Test");
+
+        assertTrue(db.getAllExecutedTasks().size() == 0);
+    }
 }
+
+
