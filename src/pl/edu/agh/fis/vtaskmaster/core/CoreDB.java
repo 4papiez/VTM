@@ -82,7 +82,8 @@ public class CoreDB {
                 "endTime        BIGINT          NOT NULL, " +
                 "duration       BIGINT          NOT NULL, " +
                 "done           BOOLEAN         NOT NULL, " +
-                "FOREIGN KEY(taskName)           REFERENCES tasks(name))";
+                "FOREIGN KEY(taskName) REFERENCES tasks(name) " +
+                "ON DELETE CASCADE)";
 
         try {
             statement.execute(createTasks);
@@ -150,36 +151,9 @@ public class CoreDB {
         return true;
     }
 
-    public boolean updateExecutedTask(ExecutedTask task) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-                "UPDATE executedTasks SET duration = ? " +
-                        "WHERE id = ?"
-        );
-
-        statement.setLong(1, task.getElapsedTime());
-        statement.setInt(2, task.getId());
-
-        statement.executeUpdate();
-        statement.close();
-        return true;
-    }
-
-    public boolean addExecutedTask(Task task, long startTime) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
-        );
-
-        preparedStatement.setString(1, task.getName());
-        preparedStatement.setLong(2, startTime);
-        preparedStatement.setLong(3, 0);
-        preparedStatement.setLong(4, 0);
-        preparedStatement.setBoolean(5, false);
-        preparedStatement.execute();
-
-        return true;
-    }
-
-    private ArrayList<Task> getTasksWithQuery(String query) throws SQLException {
+    private ArrayList<Task> getTasksWithQuery(String query)
+            throws SQLException
+    {
         ArrayList<Task> tasks = new ArrayList<>();
         ResultSet result = statement.executeQuery(query);
         int priority;
@@ -200,7 +174,6 @@ public class CoreDB {
         }
         return tasks;
     }
-
 
     public ArrayList<Task> getTodo() throws SQLException {
         return getTasksWithQuery("SELECT * FROM tasks WHERE todo");
@@ -257,10 +230,47 @@ public class CoreDB {
         return result.next();
     }
 
-    public ArrayList<ExecutedTask> getAllExecutedTasks() throws SQLException {
-        ArrayList<ExecutedTask> allTasks = new ArrayList<>();
 
-        ResultSet result = statement.executeQuery("SELECT * FROM executedTasks");
+    public boolean addExecutedTask(Task task, long startTime) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
+        );
+
+        preparedStatement.setString(1, task.getName());
+        preparedStatement.setLong(2, startTime);
+        preparedStatement.setLong(3, 0);
+        preparedStatement.setLong(4, 0);
+        preparedStatement.setBoolean(5, false);
+        preparedStatement.execute();
+
+        return true;
+    }
+
+    public boolean updateExecutedTask(ExecutedTask task) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE executedTasks SET duration = ?, done = ?" +
+                        "WHERE id = ?"
+        );
+
+        statement.setLong(1, task.getElapsedTime());
+        statement.setBoolean(2, task.isDone());
+        statement.setInt(3, task.getId());
+
+        statement.executeUpdate();
+        statement.close();
+        return true;
+    }
+
+    public boolean removeExecutedTask(ExecutedTask task) throws SQLException{
+        return statement.execute("DELETE FROM executedTasks WHERE id='" + task.getId() + "'");
+    }
+
+    private ArrayList<ExecutedTask> getExecutedTasksWithQuery(String query)
+            throws SQLException
+    {
+        ArrayList<ExecutedTask> tasks = new ArrayList<>();
+
+        ResultSet result = statement.executeQuery(query);
         String taskName;
         int id;
         boolean done;
@@ -273,12 +283,71 @@ public class CoreDB {
             endTime = result.getLong("endTime");
             elapsedTime = result.getLong("duration");
 
-            allTasks.add(
+            tasks.add(
                     new ExecutedTask(id, taskName, startTime, endTime, elapsedTime, done)
             );
         }
 
-        return allTasks;
+        return tasks;
+    }
+
+    public ArrayList<ExecutedTask> getAllExecutedTasks() throws SQLException {
+        return getExecutedTasksWithQuery("SELECT * FROM executedTasks");
+    }
+
+    public ArrayList<ExecutedTask> getAllExecutedTasksForTaskWithName(String name)
+        throws SQLException
+    {
+        return getExecutedTasksWithQuery(
+                "SELECT * FROM executedTasks WHERE taskName = '" + name + "'"
+        );
+    }
+
+    public ArrayList<ExecutedTask> getExecutedTasksBeforeDate(long date)
+        throws SQLException
+    {
+        return getExecutedTasksWithQuery(
+                "SELECT * FROM executedTasks WHERE startTime <= '" + date + "'"
+        );
+    }
+
+    public ArrayList<ExecutedTask> getExecutedTasksAfterDate(long date)
+            throws SQLException
+    {
+        return getExecutedTasksWithQuery(
+                "SELECT * FROM executedTasks WHERE startTime >= '" + date + "'"
+        );
+    }
+
+    public ArrayList<ExecutedTask> getExecutedTasksDone()
+            throws SQLException
+    {
+        return getExecutedTasksWithQuery(
+                "SELECT * FROM executedTasks WHERE done"
+        );
+    }
+
+    public ExecutedTask getExecutedTaskWithId(int id)
+            throws SQLException
+    {
+        ResultSet result = statement.executeQuery("SELECT * FROM executedTasks WHERE id = '" + id + "'");
+
+        String taskName;
+        boolean done;
+        long startTime, endTime, elapsedTime;
+        if(result.next()) {
+            id = result.getInt("id");
+            taskName = result.getString("taskName");
+            done = result.getBoolean("done");
+            startTime = result.getLong("startTime");
+            endTime = result.getLong("endTime");
+            elapsedTime = result.getLong("duration");
+
+            return new ExecutedTask(id, taskName, startTime, endTime, elapsedTime, done);
+        }
+        else {
+            return null;
+        }
     }
 
     public void closeConnection() {
