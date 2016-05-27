@@ -21,17 +21,16 @@ import javax.swing.table.DefaultTableModel;
  *
  */
 public class VTMainWindow extends JFrame {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	VirtualTaskmaster controller;
+	//Panes//
 	JPanel contentPane;
-	JTable tblToDo;
+	//Input//
 	JButton btnDelete, btnRun, btnStats, btnManageTasks;
-	JLabel[] vtcwLblTab;
 	JButton[] vtcwBtnTab;
+	//View//
+	JTable tblToDo;
+	JLabel[] vtcwLblTab;
+	
 
 	/**
 	 * Create the frame.
@@ -57,45 +56,15 @@ public class VTMainWindow extends JFrame {
 	    vtcwBtnTab = new JButton[5];
 	    vtcwLblTab = new JLabel[5];
 	    
-	    vtcwBtnTab[0] = new JButton("1");
-		vtcwBtnTab[0].setBounds(21, 170, 42, 40);
-		contentPane.add(vtcwBtnTab[0]);
-		
-		vtcwBtnTab[1] = new JButton("2");
-		vtcwBtnTab[1].setBounds(21, 208, 42, 40);
-		contentPane.add(vtcwBtnTab[1]);
-		
-		vtcwBtnTab[2] = new JButton("3");
-		vtcwBtnTab[2].setBounds(21, 244, 42, 40);
-		contentPane.add(vtcwBtnTab[2]);
-		
-		vtcwBtnTab[3] = new JButton("4");
-		vtcwBtnTab[3].setBounds(21, 280, 42, 40);
-		contentPane.add(vtcwBtnTab[3]);
-		
-		vtcwBtnTab[4] = new JButton("5");
-		vtcwBtnTab[4].setBounds(21, 317, 42, 40);
-		contentPane.add(vtcwBtnTab[4]);
-		
-		vtcwLblTab[0] = new JLabel("Empty slot");
-		vtcwLblTab[0].setBounds(69, 170, 150, 40);
-		contentPane.add(vtcwLblTab[0]);
-		
-		vtcwLblTab[1] = new JLabel("Empty slot");
-		vtcwLblTab[1].setBounds(69, 208, 150, 40);
-		contentPane.add(vtcwLblTab[1]);
-		
-		vtcwLblTab[2] = new JLabel("Empty slot");
-		vtcwLblTab[2].setBounds(69, 244, 150, 40);
-		contentPane.add(vtcwLblTab[2]);
-		
-		vtcwLblTab[3] = new JLabel("Empty slot");
-		vtcwLblTab[3].setBounds(69, 280, 150, 40);
-		contentPane.add(vtcwLblTab[3]);
-		
-		vtcwLblTab[4] = new JLabel("Empty slot");
-		vtcwLblTab[4].setBounds(69, 317, 150, 40);
-		contentPane.add(vtcwLblTab[4]);
+	    for(int i = 0; i < 5; i++){
+	    	vtcwBtnTab[i] = new JButton(new Integer(i+1).toString());
+	    	vtcwBtnTab[i].setBounds(21,170+i*38,42,40);
+	    	contentPane.add(vtcwBtnTab[i]);
+	    	
+	    	vtcwLblTab[i] = new JLabel("Empty slot");
+			vtcwLblTab[i].setBounds(69, 170+i*38, 150, 40);
+			contentPane.add(vtcwLblTab[i]);
+	    }
 		
 		btnRun = new JButton("Run");
 		btnRun.setBounds(233, 360, 109, 20);
@@ -120,19 +89,23 @@ public class VTMainWindow extends JFrame {
 		tblToDo = new JTable();
 		tblToDo.setAutoCreateRowSorter(true);
 		tblToDo.setModel(new DefaultTableModel(new Object[][] {{null,null,null,null}}, 
-				         new String[] {"Task", "Prior", "ETime", "ATime"}));
+				         new String[] {"Task", "Prior", "ETime", "ATime"}){
+							private static final long serialVersionUID = 8882114781464815468L;
+
+			@Override
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+			
+		});
 		tblToDo.getColumnModel().getColumn(0).setPreferredWidth(67);
 		tblToDo.getColumnModel().getColumn(0).setMinWidth(67);
 		tblToDo.getColumnModel().getColumn(0).setMaxWidth(67);
-		tblToDo.getColumnModel().getColumn(1).setPreferredWidth(40);
-		tblToDo.getColumnModel().getColumn(1).setMinWidth(40);
-		tblToDo.getColumnModel().getColumn(1).setMaxWidth(40);
-		tblToDo.getColumnModel().getColumn(2).setPreferredWidth(40);
-		tblToDo.getColumnModel().getColumn(2).setMinWidth(40);
-		tblToDo.getColumnModel().getColumn(2).setMaxWidth(40);
-		tblToDo.getColumnModel().getColumn(3).setPreferredWidth(40);
-		tblToDo.getColumnModel().getColumn(3).setMinWidth(40);
-		tblToDo.getColumnModel().getColumn(3).setMaxWidth(40);
+		for(int i = 1; i < 4; i++){
+			tblToDo.getColumnModel().getColumn(i).setPreferredWidth(40);
+			tblToDo.getColumnModel().getColumn(i).setMinWidth(40);
+			tblToDo.getColumnModel().getColumn(i).setMaxWidth(40);
+		}
 		tblToDo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblToDo.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		scrollPane_1.setViewportView(tblToDo);
