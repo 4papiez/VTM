@@ -7,9 +7,7 @@ package pl.edu.agh.fis.vtaskmaster.core;
 
 import java.util.ArrayList;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;

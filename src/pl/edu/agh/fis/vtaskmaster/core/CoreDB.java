@@ -183,6 +183,10 @@ public class CoreDB {
         return getTasksWithQuery("SELECT * FROM tasks WHERE favourite");
     }
 
+    public ArrayList<Task> getNonFavourites() throws SQLException {
+        return getTasksWithQuery("SELECT * FROM tasks WHERE NOT favourite");
+    }
+
     public ArrayList<Task> getAllTasks() throws SQLException {
         return getTasksWithQuery("SELECT * FROM tasks");
     }

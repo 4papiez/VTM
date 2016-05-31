@@ -1,6 +1,6 @@
 package pl.edu.agh.fis.vtaskmaster;
 
-import org.apache.commons.lang3.SystemUtils;
+// import org.apache.commons.lang3.SystemUtils;
 import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;

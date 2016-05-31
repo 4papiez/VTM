@@ -28,14 +28,6 @@ public class CoreDBTest {
     // database instance which has to be initialized before each test case
     private CoreDB db;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
     @Before
     public void setUp() {
         db = new CoreDB("test.db");
@@ -387,7 +379,8 @@ public class CoreDBTest {
 
     @Test
     public void testGetExecutedTasksDone()
-        throws SQLException {
+        throws SQLException
+    {
         Task task1 = new Task("test1", "", 1, 1, true, true);
 
         db.addTask(task1);
@@ -406,6 +399,26 @@ public class CoreDBTest {
         assertTrue(task.isDone());
 
         assertEquals(db.getExecutedTasksDone().size(), 1);
+    }
+
+    @Test
+    public void testGetAllNonFavourites()
+        throws SQLException
+    {
+        String[] name = {"Test1", "Test2", "Test3", "Test4"};
+        boolean[] favourite = {false, false, false, true};
+
+        for(int i = 0; i < 4; ++i) {
+            Task task = new Task(name[i], "test", 2, 200, favourite[i], false);
+            db.addTask(task);
+        }
+
+        ArrayList<Task> nonFavourites = db.getNonFavourites();
+        for(Task task : nonFavourites) {
+            assertFalse(task.isFavourite());
+        }
+
+        assertTrue(nonFavourites.size() == 3);
     }
 }
 
