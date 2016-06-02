@@ -1,5 +1,6 @@
 package pl.edu.agh.fis.vtaskmaster;
 
+// import org.apache.commons.lang3.SystemUtils;
 import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,30 +17,23 @@ import javax.swing.Timer;
  * @version preprepre0.000000001zeta
  *
  */
-public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely cool light witch informs whether the task is in progress or not
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	Timer tmrH;
-	boolean active;
-	
+public class VTaskControlWindow extends JDialog {
 	enum VTCState{
 		vtcwStarted,
 		vtcwPaused,
-	}
-	
+		vtcwFinished,
+	}	
+	private static final long serialVersionUID = 1L;		
+	//Panes//
+	private JPanel contentPane;	
+	//Input//
+	JButton VTPlay, VTPause, VTStop;
+	//Visual//
+	JLabel lblVTimeHours, lblVTimeMinutes, lblVTaskName,lblInProgress;
+	//Logic//
 	VTCState state = VTCState.vtcwStarted;
-	JButton VTPlay;
-	JButton VTPause;
-	JButton VTStop;
-	
-	JLabel lblVTimeHours;
-	JLabel lblVTimeMinutes;
-	JLabel lblVTaskName;
-
+	boolean active;
+	Timer tmrH;
 	/**
 	 * Launch the application.
 	 */
@@ -62,6 +56,7 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 	public VTaskControlWindow(String taskName, String taskTimeHours, String taskTimeMins) {
 		active = false;
 		setVisible(false);
+		setResizable(false);
 		
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 294, 77);
@@ -76,12 +71,10 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 		VTPause = new JButton("");
 		VTPause.setBounds(200, 5, 40, 40);
 		
-		VTStop = new JButton(""); //TODO VTCW implement STOP button, after defining proper behavior of stopping program
+		VTStop = new JButton("");
 		VTStop.setBounds(240, 5, 40, 40);
 		
-		VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtplay.png"));
-		VTPause.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtpause.png"));
-		VTStop.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtstop.png")); 	        
+			        
 		contentPane.add(VTPlay);
 		contentPane.add(VTPause);
 		contentPane.add(VTStop);
@@ -102,6 +95,20 @@ public class VTaskControlWindow extends JDialog { //TODO VTCW ??? add awesomely 
 		lblVTaskName.setFont(new Font("Dialog", Font.BOLD, 18));
 		lblVTaskName.setBounds(5, 5, 140, 15);
 		contentPane.add(lblVTaskName);
+		
+		if(true /*SystemUtils.IS_OS_UNIX*/){
+			VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtplay.png"));
+			VTPause.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtpause.png"));
+			VTStop.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtstop.png"));
+			lblInProgress = new JLabel(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+			lblInProgress.setBounds(145,30,10,10);
+			contentPane.add(lblInProgress);
+		}/*else if(SystemUtils.IS_OS_WINDOWS){
+			VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\vtplay.png"));
+			VTPause.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\vtpause.png"));
+			VTStop.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\vtstop.png"));
+			lblInProgress = new JLabel(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\lighton.png"));
+		}*/
 	}
 	void setTask(String taskName, String taskTimeHours, String taskTimeMins){
 		lblVTaskName.setText(taskName);

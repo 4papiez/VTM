@@ -14,14 +14,22 @@ public class CoreManager {
     private CoreDB db;
 
     /**
+     * Reference to the stats.
+     * @see pl.edu.agh.fis.vtaskmaster.core.CoreStats
+     */
+    public CoreStats stats;
+
+    /**
      * Create CoreManager. The constructor initializes the reference to DB.
      */
     public CoreManager() {
         db = new CoreDB();
+        stats = new CoreStats(db);
     }
 
     public CoreManager(String dbName) {
         db = new CoreDB(dbName);
+        stats = new CoreStats(db);
     }
 
 

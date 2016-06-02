@@ -27,28 +27,26 @@ import javax.swing.JOptionPane;
  *
  */
 public class VTasksManager extends JDialog {
-
-	/**
-	 * 
-	 */
+	enum returnState{
+		VTM_RUN,
+		VTM_TODO,
+		VTM_REJECTED
+	}
 	private static final long serialVersionUID = 1L;
+	//Panes//
 	JPanel contentPane;
-	JTextField textField;
-	JTable tblFavourites;
-	JTable tblHistory;
-	JButton btnDelete;
+	JTabbedPane tabbedPane;	
 	JTextPane textPane;
-	JSpinner spinner;
-	JSpinner spinner_1;
-	JSpinner spinner_2;
-	JTabbedPane tabbedPane;
-	enum returnState{VTM_RUN, VTM_TODO, VTM_REJECTED}
+	//Input//
+	JTextField textField;
+	JSpinner spnr_prior, spnr_hour, spnr_mint;
+	JButton btnDelete, btnRun, btnFromList,
+    btnToList, btnToDo, btnFavourites;
+	//View//
+	JTable tblFavourites, tblHistory;	
+	//Logic//
+	boolean tabEdit;
 	returnState rS;
-	JButton btnRun;
-	JButton btnFromList;
-	JButton btnToList;
-	JButton btnToDo;
-	JButton btnFavourites;
 	/**
 	 * Launch the application.
 	 */
@@ -70,7 +68,9 @@ public class VTasksManager extends JDialog {
 	 * Create the frame.
 	 */
 	public VTasksManager() {
+		tabEdit = false;
 		setTitle("Manage your tasks");
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		new JOptionPane();
@@ -96,20 +96,20 @@ public class VTasksManager extends JDialog {
 		lblTaskName.setBounds(22, 2, 108, 15);
 		contentPane.add(lblTaskName);
 		
-		spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(1, 1, 10, 1));
-		spinner.setBounds(12, 181, 40, 20);		
-		contentPane.add(spinner);
+		spnr_prior = new JSpinner();
+		spnr_prior.setModel(new SpinnerNumberModel(1, 1, 10, 1));
+		spnr_prior.setBounds(12, 181, 40, 20);		
+		contentPane.add(spnr_prior);
 		
-		spinner_1 = new JSpinner();
-		spinner_1.setModel(new SpinnerNumberModel(0, 0, 23, 1));
-		spinner_1.setBounds(89, 181, 40, 20);
-		contentPane.add(spinner_1);
+		spnr_hour = new JSpinner();
+		spnr_hour.setModel(new SpinnerNumberModel(0, 0, 23, 1));
+		spnr_hour.setBounds(89, 181, 40, 20);
+		contentPane.add(spnr_hour);
 		
-		spinner_2 = new JSpinner();
-		spinner_2.setModel(new SpinnerNumberModel(0, 0, 59, 1));
-		spinner_2.setBounds(124, 181, 40, 20);
-		contentPane.add(spinner_2);
+		spnr_mint = new JSpinner();
+		spnr_mint.setModel(new SpinnerNumberModel(0, 0, 59, 1));
+		spnr_mint.setBounds(124, 181, 40, 20);
+		contentPane.add(spnr_mint);
 		
 		JLabel lblPrior = new JLabel("Priority:");
 		lblPrior.setBounds(12, 167, 142, 15);
@@ -132,19 +132,24 @@ public class VTasksManager extends JDialog {
 		tblFavourites.setFillsViewportHeight(true);
 		tblFavourites.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		scrollPane.setViewportView(tblFavourites);
-		tblFavourites.setModel(new DefaultTableModel(new Object[][] {{null,null,null,null}},new String[] {"Task", "Prior", "ETime", "ATime"}));
+		tblFavourites.setModel(new DefaultTableModel(
+							   new Object[][] {{null,null,null,null}},
+							   new String[] {"Task", "Prior", "ETime", "ATime"}){
+								private static final long serialVersionUID = 1976474394015570470L;
+
+								@Override
+		 						public boolean isCellEditable(int row, int column){
+		 							return tabEdit;
+		 						}
+							   });
 		tblFavourites.getColumnModel().getColumn(0).setPreferredWidth(67);
 		tblFavourites.getColumnModel().getColumn(0).setMinWidth(67);
 		tblFavourites.getColumnModel().getColumn(0).setMaxWidth(67);
-		tblFavourites.getColumnModel().getColumn(1).setPreferredWidth(40);
-		tblFavourites.getColumnModel().getColumn(1).setMinWidth(40);
-		tblFavourites.getColumnModel().getColumn(1).setMaxWidth(40);
-		tblFavourites.getColumnModel().getColumn(2).setPreferredWidth(40);
-		tblFavourites.getColumnModel().getColumn(2).setMinWidth(40);
-		tblFavourites.getColumnModel().getColumn(2).setMaxWidth(40);
-		tblFavourites.getColumnModel().getColumn(3).setPreferredWidth(40);
-		tblFavourites.getColumnModel().getColumn(3).setMinWidth(40);
-		tblFavourites.getColumnModel().getColumn(3).setMaxWidth(40);
+		for(int i = 1; i < 4; i++){
+			tblFavourites.getColumnModel().getColumn(i).setPreferredWidth(40);
+			tblFavourites.getColumnModel().getColumn(i).setMinWidth(40);
+			tblFavourites.getColumnModel().getColumn(i).setMaxWidth(40);
+		}
 		tblFavourites.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblFavourites.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		scrollPane.setViewportView(tblFavourites);
@@ -161,19 +166,22 @@ public class VTasksManager extends JDialog {
 		tblHistory.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		scrollPane_2.setViewportView(tblHistory);
 		tblHistory.setModel(new DefaultTableModel(
-			new Object[][] {{null,null,null,null}},new String[] {"Task", "Prior", "ETime", "ATime"}));
+			new Object[][] {{null,null,null,null}},new String[] {"Task", "Prior", "ETime", "ATime"}){
+				private static final long serialVersionUID = 2276563851285086245L;
+
+				@Override
+				public boolean isCellEditable(int row, int column){
+					return tabEdit;
+				}
+			});
 		tblHistory.getColumnModel().getColumn(0).setPreferredWidth(67);
 		tblHistory.getColumnModel().getColumn(0).setMinWidth(67);
 		tblHistory.getColumnModel().getColumn(0).setMaxWidth(67);
-		tblHistory.getColumnModel().getColumn(1).setPreferredWidth(40);
-		tblHistory.getColumnModel().getColumn(1).setMinWidth(40);
-		tblHistory.getColumnModel().getColumn(1).setMaxWidth(40);
-		tblHistory.getColumnModel().getColumn(2).setPreferredWidth(40);
-		tblHistory.getColumnModel().getColumn(2).setMinWidth(40);
-		tblHistory.getColumnModel().getColumn(2).setMaxWidth(40);
-		tblHistory.getColumnModel().getColumn(3).setPreferredWidth(40);
-		tblHistory.getColumnModel().getColumn(3).setMinWidth(40);
-		tblHistory.getColumnModel().getColumn(3).setMaxWidth(40);
+		for(int i = 1; i < 4; i++){
+			tblHistory.getColumnModel().getColumn(i).setPreferredWidth(40);
+			tblHistory.getColumnModel().getColumn(i).setMinWidth(40);
+			tblHistory.getColumnModel().getColumn(i).setMaxWidth(40);
+		}
 		tblHistory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblHistory.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		scrollPane_2.setViewportView(tblHistory);
