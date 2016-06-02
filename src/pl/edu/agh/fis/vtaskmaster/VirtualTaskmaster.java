@@ -17,16 +17,10 @@ import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
 import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 
 /**
-<<<<<<< HEAD
  * @author Grzegorz Burzynski
  * @author Kamil Piastowicz
  * @author Wiktor Wudarczyk
  * @version 1.0
-=======
- * @author Grzegorz Burzyński
- * @author Kamil Piastowicz
- * @version 0.000000002zeta
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
  */
 public class VirtualTaskmaster {
 
@@ -35,10 +29,7 @@ public class VirtualTaskmaster {
     private VTStats vTS;
     private VTaskControlWindow[] vtcwTab;
     private VTaskControlWindow.VTCState[] state;
-<<<<<<< HEAD
     private CoreManager database;
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
     private long[] currTime;
     private long[] startTime;
     private long[] elapsedTime;
@@ -86,12 +77,9 @@ public class VirtualTaskmaster {
 
         vTM.setModal(true);
         vTM.setVisible(false);
-<<<<<<< HEAD
         database = new CoreManager();
         fillTable(vTM.tblHistory, database.getHistory());
 		fillTable(vTM.tblFavourites, database.getFavourites());
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
 
         /**
          * VirtualTaskmasterMainWindow event handlers
@@ -101,10 +89,7 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 int selRow = vTMW.tblToDo.getSelectedRow();
                 if (selRow != -1 && vTMW.tblToDo.getValueAt(selRow, 0) != null) {
-<<<<<<< HEAD
                 	database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)).setTodo(false);
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
@@ -120,10 +105,7 @@ public class VirtualTaskmaster {
                     int min = VTasksManager.getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), true);
                     handleVTCW(h, min, (String) vTMW.tblToDo.getValueAt(selRow, 0), (int) vTMW.tblToDo.getValueAt(selRow, 1));
                     System.out.println("name: " + (String) vTMW.tblToDo.getValueAt(selRow, 0));
-<<<<<<< HEAD
                     database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
                 }
             }
@@ -140,14 +122,10 @@ public class VirtualTaskmaster {
                                 (int)vTM.spnr_mint.getValue(),
                                 vTM.textField.getText(),
                                 (int)vTM.spnr_prior.getValue());
-<<<<<<< HEAD
                         if(database.getTaskByName(vTM.textField.getText()) == null){
                         	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                         }
                         database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());		
-=======
-                        		
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     }else{
                         JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
                     }
@@ -159,13 +137,10 @@ public class VirtualTaskmaster {
                         vTMW.tblToDo.setValueAt((int)vTM.spnr_prior.getValue(), eRow, 1);
                         vTMW.tblToDo.setValueAt(VTMainWindow.timeFiller((int)vTM.spnr_hour.getValue())+":"+ VTMainWindow.timeFiller((int)vTM.spnr_mint.getValue()), eRow, 2);
                         vTMW.tblToDo.setValueAt("00:00", eRow, 3);
-<<<<<<< HEAD
                         if(database.getTaskByName(vTM.textField.getText()) == null){
                         	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                         }
                         database.getTaskByName(vTM.textField.getText()).setTodo(true);
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     }else{
                         JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
                     }
@@ -269,10 +244,7 @@ public class VirtualTaskmaster {
                         vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,1), row, 1);
                         vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,2), row, 2);
                         vTM.tblFavourites.setValueAt(vTM.tblHistory.getValueAt(selRow,3), row, 3);
-<<<<<<< HEAD
                         database.getTaskByName((String) vTM.tblHistory.getValueAt(selRow, 0)).setFavourite(true);
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     }else{
                         JOptionPane.showMessageDialog(new JFrame(), "You need to select a filled row.");
                     }
@@ -317,12 +289,9 @@ public class VirtualTaskmaster {
                 vTM.tabEdit = false;
                 System.out.println(vTM.textField.getText());
                 if (tbl == vTM.tblFavourites) {
-<<<<<<< HEAD
                 	if(database.getTaskByName((String) vTM.textField.getText()) == null){
                 		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                 	}
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     int row = VTasksManager.tblFindEmptyRow(vTM.tblHistory);
                     if(vTM.tblHistory.getValueAt(row, 0) == null){
                         ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
@@ -335,13 +304,10 @@ public class VirtualTaskmaster {
                     else{
                         vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
                     }
-<<<<<<< HEAD
                 } else {
                 	if(database.getTaskByName((String) vTM.textField.getText()) == null){
                 		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, true));
                 	}
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                 }
                 
             }
@@ -375,7 +341,6 @@ public class VirtualTaskmaster {
                     if (state[i] == VTaskControlWindow.VTCState.vtcwStarted) {
                         vtcwTab[i].lblVTimeMinutes.setText(countDownTime(i, false));
                         vtcwTab[i].lblVTimeHours.setText(countDownTime(i, true));
-<<<<<<< HEAD
                         
                         ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                         for(int j = 0; j < tasks.size(); j++){
@@ -383,8 +348,6 @@ public class VirtualTaskmaster {
                         		database.updateExecutedTask(tasks.get(j));
                         	}
                         }
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
                     }
                 }
             }
@@ -415,7 +378,6 @@ public class VirtualTaskmaster {
                 elapsedTime[0] = elapsedTime[0] - (currTime[0] - startTime[0]);
                 vtcwTab[0] = new VTaskControlWindow("empty slot", "00", "00");
                 vTMW.vtcwLblTab[0].setText("Empty slot");
-<<<<<<< HEAD
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getTaskName() == vtcwTab[0].lblVTaskName.getText() && !(tasks.get(j).isDone())){
@@ -423,8 +385,6 @@ public class VirtualTaskmaster {
                 		break;
                 	}
                 }
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
             }
         };
         vtcwTab[0].VTPlay.addMouseListener(mAdapterPlay);
@@ -455,7 +415,6 @@ public class VirtualTaskmaster {
                 elapsedTime[1] = elapsedTime[1] - (currTime[1] - startTime[1]);
                 vtcwTab[1] = new VTaskControlWindow("empty slot", "00", "00");
                 vTMW.vtcwLblTab[1].setText("Empty slot");
-<<<<<<< HEAD
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getTaskName() == vtcwTab[1].lblVTaskName.getText() && !(tasks.get(j).isDone())){
@@ -464,8 +423,6 @@ public class VirtualTaskmaster {
                 	}
                 }
                 
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
             }
         };
         vtcwTab[1].VTPlay.addMouseListener(mAdapterPlay);
@@ -496,7 +453,6 @@ public class VirtualTaskmaster {
                 elapsedTime[2] = elapsedTime[2] - (currTime[2] - startTime[2]);
                 vtcwTab[2] = new VTaskControlWindow("empty slot", "00", "00");
                 vTMW.vtcwLblTab[2].setText("Empty slot");
-<<<<<<< HEAD
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getTaskName() == vtcwTab[2].lblVTaskName.getText() && !(tasks.get(j).isDone())){
@@ -504,8 +460,6 @@ public class VirtualTaskmaster {
                 		break;
                 	}
                 }
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
             }
         };
         vtcwTab[2].VTPlay.addMouseListener(mAdapterPlay);
@@ -536,7 +490,6 @@ public class VirtualTaskmaster {
                 elapsedTime[3] = elapsedTime[3] - (currTime[3] - startTime[3]);
                 vtcwTab[3] = new VTaskControlWindow("empty slot", "00", "00");
                 vTMW.vtcwLblTab[3].setText("Empty slot");
-<<<<<<< HEAD
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getTaskName() == vtcwTab[3].lblVTaskName.getText() && !(tasks.get(j).isDone())){
@@ -544,8 +497,6 @@ public class VirtualTaskmaster {
                 		break;
                 	}
                 }
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
             }
         };
         vtcwTab[3].VTPlay.addMouseListener(mAdapterPlay);
@@ -576,7 +527,6 @@ public class VirtualTaskmaster {
                 elapsedTime[4] = elapsedTime[4] - (currTime[4] - startTime[4]);
                 vtcwTab[4] = new VTaskControlWindow("empty slot", "00", "00");
                 vTMW.vtcwLblTab[4].setText("Empty slot");
-<<<<<<< HEAD
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getTaskName() == vtcwTab[4].lblVTaskName.getText() && !(tasks.get(j).isDone())){
@@ -584,8 +534,6 @@ public class VirtualTaskmaster {
                 		break;
                 	}
                 }
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
             }
         };
         vtcwTab[4].VTPlay.addMouseListener(mAdapterPlay);
@@ -679,7 +627,6 @@ public class VirtualTaskmaster {
     boolean validateDataVTM(int h, int min, String name, String desc){
         return ((h != 0 || min != 0) && !name.equals("") && !desc.equals(""));
     }
-<<<<<<< HEAD
 	void fillTable(JTable tbl, ArrayList<Task> tasks){
 		for(int i=0; i<tasks.size(); i++){
 			Task task = tasks.get(i);
@@ -698,7 +645,5 @@ public class VirtualTaskmaster {
 				tbl.setValueAt(th+":"+tm, i, 3); // no idea how to do this properly~
 		}
 	}
-=======
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
 }
 
