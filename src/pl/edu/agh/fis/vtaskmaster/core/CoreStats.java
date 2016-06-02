@@ -188,4 +188,28 @@ public class CoreStats {
 
         return sum / counter;
     }
+<<<<<<< HEAD
+=======
+
+    public long averageTimeForTaskWithName(String taskName)
+        throws SQLException
+    {
+        if(!db.isTaskWithName(taskName)) {
+            return 0;
+        }
+
+        long sum = 0;
+        int doneCounter = 0;
+        for(ExecutedTask executedTask : db.getAllExecutedTasksForTaskWithName(taskName)) {
+            if(!executedTask.isDone()) continue;
+            sum += executedTask.getElapsedTime();
+            doneCounter++;
+        }
+
+        if(doneCounter == 0)
+            return 0;
+
+        return sum / doneCounter;
+    }
+>>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
 }

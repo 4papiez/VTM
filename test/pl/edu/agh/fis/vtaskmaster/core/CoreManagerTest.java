@@ -7,9 +7,7 @@ package pl.edu.agh.fis.vtaskmaster.core;
 
 import java.util.ArrayList;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
@@ -24,24 +22,16 @@ public class CoreManagerTest {
     private CoreManager instance;
     /** Name of the testing instance */
     private final static String NAME="TEST";
-    
-    public CoreManagerTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
+
     @Before
     public void setUp() {
+        instance = new CoreManager("test.db");
     }
     
     @After
     public void tearDown() {
+        instance.cleardb();
+        instance.finalize();
     }
 
     /**
@@ -287,5 +277,6 @@ public class CoreManagerTest {
         assertEquals(expResult, result);
         System.out.println(" PASSED");
     }
+
     
 }

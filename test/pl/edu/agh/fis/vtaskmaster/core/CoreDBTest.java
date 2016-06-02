@@ -5,8 +5,11 @@
  */
 package pl.edu.agh.fis.vtaskmaster.core;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.lang.*;
+import java.util.Date;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -25,14 +28,6 @@ public class CoreDBTest {
     // database instance which has to be initialized before each test case
     private CoreDB db;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
     @Before
     public void setUp() {
         db = new CoreDB("test.db");
@@ -280,4 +275,151 @@ public class CoreDBTest {
         boolean result = instance.clearDB();
         assertEquals(expResult, result);
     }
+
+    /**
+     * Checks if ExecutedTasks delete when we delete their Task
+     */
+    @Test
+    public void testAfterDeletingTaskExecutedTasksDeleteAsWell()
+            throws SQLException
+    {
+        Task task = new Task("Test", "test", 1, 1, true, true);
+        db.addTask(task);
+        db.addExecutedTask(task, 0);
+        db.addExecutedTask(task, 6);
+
+        assertTrue(db.getAllExecutedTasks().size() == 2);
+
+        db.removeTaskByName("Test");
+
+        assertTrue(db.getAllExecutedTasks().size() == 0);
+    }
+
+    @Test
+    public void testGetAllExecutedTasksForTaskWithNameReturnsProperExecutedTasks()
+        throws SQLException
+    {
+        Task task1 = new Task("test1", "", 1, 1, true, true);
+        Task task2 = new Task("test2", "", 1, 1, true, true);
+
+        db.addTask(task1);
+        db.addTask(task2);
+
+        db.addExecutedTask(task1, 16);
+        db.addExecutedTask(task1, 1616);
+
+        db.addExecutedTask(task2, 32);
+        db.addExecutedTask(task2, 64);
+
+        for (ExecutedTask task : db.getAllExecutedTasksForTaskWithName("test1")) {
+            assertEquals(task.getTaskName(), "test1");
+        }
+
+        for (ExecutedTask task : db.getAllExecutedTasksForTaskWithName("test2")) {
+            assertEquals(task.getTaskName(), "test2");
+        }
+    }
+
+    @Test
+    public void testGetExecutedTasksBeforeDate()
+        throws SQLException
+    {
+        Task task1 = new Task("test1", "", 1, 1, true, true);
+
+        db.addTask(task1);
+
+        db.addExecutedTask(task1, 1463771160000L);
+        db.addExecutedTask(task1, 1464548760000L);
+        db.addExecutedTask(task1, 1463252760000L);
+
+        for(ExecutedTask task : db.getExecutedTasksBeforeDate(1464548759999L)) {
+            assertTrue(task.getStartTime() <= 1464548759999L);
+        }
+
+    }
+
+    @Test
+    public void testGetExecutedTasksAfterDate()
+            throws SQLException
+    {
+        Task task1 = new Task("test1", "", 1, 1, true, true);
+
+        db.addTask(task1);
+
+        db.addExecutedTask(task1, 1463771160000L);
+        db.addExecutedTask(task1, 1464548760000L);
+        db.addExecutedTask(task1, 1463252760000L);
+
+        for(ExecutedTask task : db.getExecutedTasksAfterDate(1464548759999L)) {
+            assertTrue(task.getStartTime() >= 1464548759999L);
+        }
+
+    }
+
+    @Test
+    public void testRemoveExecutedTask()
+        throws SQLException
+    {
+        Task task1 = new Task("test1", "", 1, 1, true, true);
+
+        db.addTask(task1);
+
+        db.addExecutedTask(task1, 1463771160000L);
+        db.addExecutedTask(task1, 1464548760000L);
+        db.addExecutedTask(task1, 1463252760000L);
+
+        assertTrue(db.getAllExecutedTasksForTaskWithName("test1").size() == 3);
+
+        for(ExecutedTask task : db.getAllExecutedTasksForTaskWithName("test1")) {
+            db.removeExecutedTask(task);
+        }
+
+        assertTrue(db.getAllExecutedTasksForTaskWithName("test1").size() == 0);
+    }
+
+    @Test
+    public void testGetExecutedTasksDone()
+        throws SQLException
+    {
+        Task task1 = new Task("test1", "", 1, 1, true, true);
+
+        db.addTask(task1);
+
+        db.addExecutedTask(task1, 1463771160000L);
+        db.addExecutedTask(task1, 1464548760000L);
+        db.addExecutedTask(task1, 1463252760000L);
+
+        ExecutedTask task = db.getExecutedTaskWithId(1);
+        assertEquals(task.getId(), 1);
+
+        task.setDone(true);
+        db.updateExecutedTask(task);
+
+        task = db.getExecutedTaskWithId(1);
+        assertTrue(task.isDone());
+
+        assertEquals(db.getExecutedTasksDone().size(), 1);
+    }
+
+    @Test
+    public void testGetAllNonFavourites()
+        throws SQLException
+    {
+        String[] name = {"Test1", "Test2", "Test3", "Test4"};
+        boolean[] favourite = {false, false, false, true};
+
+        for(int i = 0; i < 4; ++i) {
+            Task task = new Task(name[i], "test", 2, 200, favourite[i], false);
+            db.addTask(task);
+        }
+
+        ArrayList<Task> nonFavourites = db.getNonFavourites();
+        for(Task task : nonFavourites) {
+            assertFalse(task.isFavourite());
+        }
+
+        assertTrue(nonFavourites.size() == 3);
+    }
 }
+
+
