@@ -188,8 +188,7 @@ public class CoreStats {
 
         return sum / counter;
     }
-<<<<<<< HEAD
-=======
+
 
     public long averageTimeForTaskWithName(String taskName)
         throws SQLException
@@ -211,5 +210,5 @@ public class CoreStats {
 
         return sum / doneCounter;
     }
->>>>>>> ff5777eee4c872937a947f242140a27337c0baf6
+
 }
