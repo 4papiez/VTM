@@ -270,7 +270,10 @@ public class VirtualTaskmaster {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
-                if (tbl == vTM.tblHistory) return;
+                if (tbl == vTM.tblHistory
+                		|| vTM.textField.getText().equals("")
+                		|| ((int)vTM.spnr_hour.getValue() == 0 && (int)vTM.spnr_mint.getValue() == 0)
+                		|| vTM.textPane.getText().equals("")) return;
                 int selRow = tbl.getSelectedRow();
                 vTM.tabEdit = true;
                 if(selRow == -1)
@@ -291,19 +294,7 @@ public class VirtualTaskmaster {
                 if (tbl == vTM.tblFavourites) {
                 	if(database.getTaskByName((String) vTM.textField.getText()) == null){
                 		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
-                	}
-                    int row = VTasksManager.tblFindEmptyRow(vTM.tblHistory);
-                    if(vTM.tblHistory.getValueAt(row, 0) == null){
-                        ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
-                    }
-                    vTM.tblHistory.setValueAt(vTM.textField.getText(),row,0);
-                    vTM.tblHistory.setValueAt(vTM.spnr_prior.getValue(),row,1);
-                    if((int)(vTM.spnr_mint.getValue()) > 9){
-                        vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":"+vTM.spnr_mint.getValue(),row,2);
-                    }
-                    else{
-                        vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
-                    }
+                	}              
                 } else {
                 	if(database.getTaskByName((String) vTM.textField.getText()) == null){
                 		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, true));
