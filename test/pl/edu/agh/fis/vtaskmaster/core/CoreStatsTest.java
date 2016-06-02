@@ -301,4 +301,27 @@ public class CoreStatsTest {
         assertEquals(6, stats.averagePriority());
     }
 
+    @Test
+    public void testAverageTimeOfTaskWithName()
+        throws SQLException
+    {
+        Task task1 = new Task("Task1", "test", 10, 500, true, false);
+        db.addTask(task1);
+
+        db.addExecutedTask(task1, 0);
+        db.addExecutedTask(task1, 0);
+        db.addExecutedTask(task1, 0);
+        db.addExecutedTask(task1, 0);
+
+        long time = 3000L;
+        for(ExecutedTask executedTask : db.getAllExecutedTasksForTaskWithName("Task1")) {
+            executedTask.setDone(true);
+            executedTask.setElapsedTime(time);
+            db.updateExecutedTask(executedTask);
+            time += 1000L;
+        }
+
+        assertEquals(4500, stats.averageTimeForTaskWithName("Task1"));
+    }
+
 }
