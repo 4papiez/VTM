@@ -34,6 +34,7 @@ public class VTaskControlWindow extends JDialog {
 	VTCState state = VTCState.vtcwStarted;
 	boolean active;
 	Timer tmrH;
+	String sep;
 	/**
 	 * Launch the application.
 	 */
@@ -57,6 +58,8 @@ public class VTaskControlWindow extends JDialog {
 		active = false;
 		setVisible(false);
 		setResizable(false);
+		
+		sep = System.getProperty("file.separator");
 		
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 294, 77);
@@ -96,19 +99,14 @@ public class VTaskControlWindow extends JDialog {
 		lblVTaskName.setBounds(5, 5, 140, 15);
 		contentPane.add(lblVTaskName);
 		
-		if(true /*SystemUtils.IS_OS_UNIX*/){
-			VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtplay.png"));
-			VTPause.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtpause.png"));
-			VTStop.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtstop.png"));
-			lblInProgress = new JLabel(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
-			lblInProgress.setBounds(145,30,10,10);
-			contentPane.add(lblInProgress);
-		}/*else if(SystemUtils.IS_OS_WINDOWS){
-			VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\vtplay.png"));
-			VTPause.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\vtpause.png"));
-			VTStop.setIcon(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\vtstop.png"));
-			lblInProgress = new JLabel(new ImageIcon(System.getProperty("user.dir")+"\\src\\pl\\edu\\agh\\fis\\vtaskmaster\\lighton.png"));
-		}*/
+		
+		VTPlay.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"vtplay.png"));
+		VTPause.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"vtpause.png"));
+		VTStop.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"vtstop.png"));
+		lblInProgress = new JLabel(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
+		lblInProgress.setBounds(145,30,10,10);
+		contentPane.add(lblInProgress);
+		
 	}
 	void setTask(String taskName, String taskTimeHours, String taskTimeMins){
 		lblVTaskName.setText(taskName);

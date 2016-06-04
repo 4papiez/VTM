@@ -34,6 +34,7 @@ public class VirtualTaskmaster {
     private long[] startTime;
     private long[] elapsedTime;
     private Timer tmrMin;
+    String sep;
 
 
     /**
@@ -71,6 +72,7 @@ public class VirtualTaskmaster {
         elapsedTime = new long[5];
         startTime = new long[5];
         state = new VTaskControlWindow.VTCState[5];
+        sep = System.getProperty("file.separator");
         for (int i = 0; i < 5; i++)
             vtcwTab[i] = new VTaskControlWindow("empty slot", "00", "00");
 
@@ -351,7 +353,7 @@ public class VirtualTaskmaster {
                 state[0] = VTCState.vtcwStarted;
                 currTime[0] = System.currentTimeMillis();
                 startTime[0] = currTime[0];
-                vtcwTab[0].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+                vtcwTab[0].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
             }
         };
         MouseAdapter mAdapterPause = new MouseAdapter() {
@@ -359,7 +361,7 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 state[0] = VTCState.vtcwPaused;
                 elapsedTime[0] = elapsedTime[0] - (currTime[0] - startTime[0]);
-                vtcwTab[0].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
+                vtcwTab[0].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
             }
         };
         MouseAdapter mAdapterStop = new MouseAdapter(){
@@ -388,7 +390,7 @@ public class VirtualTaskmaster {
                 state[1] = VTCState.vtcwStarted;
                 currTime[1] = System.currentTimeMillis();
                 startTime[1] = currTime[1];
-                vtcwTab[1].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+                vtcwTab[1].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
             }
         };
         mAdapterPause = new MouseAdapter() {
@@ -396,7 +398,7 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 state[1] = VTCState.vtcwPaused;
                 elapsedTime[1] = elapsedTime[1] - (currTime[1] - startTime[1]);
-                vtcwTab[1].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
+                vtcwTab[1].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
             }
         };
         mAdapterStop = new MouseAdapter(){
@@ -426,7 +428,7 @@ public class VirtualTaskmaster {
                 state[2] = VTCState.vtcwStarted;
                 currTime[2] = System.currentTimeMillis();
                 startTime[2] = currTime[2];
-                vtcwTab[2].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+                vtcwTab[2].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
             }
         };
         mAdapterPause = new MouseAdapter() {
@@ -434,7 +436,7 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 state[2] = VTCState.vtcwPaused;
                 elapsedTime[2] = elapsedTime[2] - (currTime[2] - startTime[2]);
-                vtcwTab[2].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
+                vtcwTab[2].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
             }
         };
         mAdapterStop = new MouseAdapter(){
@@ -463,7 +465,7 @@ public class VirtualTaskmaster {
                 state[3] = VTCState.vtcwStarted;
                 currTime[3] = System.currentTimeMillis();
                 startTime[3] = currTime[3];
-                vtcwTab[3].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+                vtcwTab[3].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
             }
         };
         mAdapterPause = new MouseAdapter() {
@@ -471,7 +473,7 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 state[3] = VTCState.vtcwPaused;
                 elapsedTime[3] = elapsedTime[3] - (currTime[3] - startTime[3]);
-                vtcwTab[3].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
+                vtcwTab[3].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
             }
         };
         mAdapterStop = new MouseAdapter(){
@@ -500,7 +502,7 @@ public class VirtualTaskmaster {
                 state[4] = VTCState.vtcwStarted;
                 currTime[4] = System.currentTimeMillis();
                 startTime[4] = currTime[4];
-                vtcwTab[4].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lighton.png"));
+                vtcwTab[4].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
             }
         };
         mAdapterPause = new MouseAdapter() {
@@ -508,7 +510,7 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 state[4] = VTCState.vtcwPaused;
                 elapsedTime[4] = elapsedTime[4] - (currTime[4] - startTime[4]);
-                vtcwTab[4].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/lightoff.png"));
+                vtcwTab[4].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
             }
         };
         mAdapterStop = new MouseAdapter(){

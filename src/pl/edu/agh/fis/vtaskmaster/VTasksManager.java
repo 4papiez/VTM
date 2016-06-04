@@ -47,6 +47,7 @@ public class VTasksManager extends JDialog {
 	//Logic//
 	boolean tabEdit;
 	returnState rS;
+	String sep;
 	/**
 	 * Launch the application.
 	 */
@@ -78,6 +79,7 @@ public class VTasksManager extends JDialog {
 		contentPane.setBorder(new LineBorder(new Color(0, 0, 0)));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		sep = System.getProperty("file.separator");
 		
 		textField = new JTextField();
 		textField.setBounds(12, 16, 172, 19);

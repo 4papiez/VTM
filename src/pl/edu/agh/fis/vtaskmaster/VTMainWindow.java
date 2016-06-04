@@ -30,6 +30,8 @@ public class VTMainWindow extends JFrame {
 	//View//
 	JTable tblToDo;
 	JLabel[] vtcwLblTab;
+	//Logic//
+	String sep;
 	
 
 	/**
@@ -42,14 +44,14 @@ public class VTMainWindow extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		sep = System.getProperty("file.separator");
 		
 		setResizable(false);
 		setTitle("VirtualTaskmaster");
 		setBounds(100, 100, 455, 420);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane.setLayout(null);
-	    JLabel logoLabel = new JLabel(new ImageIcon(System.getProperty("user.dir")+"/src/pl/edu/agh/fis/vtaskmaster/vtaskmaster.png")); //FIXME VT LOGO - better picture needed
-	    System.out.print(System.getProperty("user.dir"));
+	    JLabel logoLabel = new JLabel(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"vtaskmaster.png"));
 	    logoLabel.setBounds(75,6,305,40);
 	    contentPane.add(logoLabel);	
 	    
