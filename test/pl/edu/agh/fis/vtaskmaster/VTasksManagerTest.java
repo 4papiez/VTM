@@ -58,7 +58,7 @@ public class VTasksManagerTest {
         VTasksManager vtm = new VTasksManager();
         JTable tbl = vtm.tblFavourites;
         int expResult = 0;
-        int result = VTasksManager.tblFindEmptyRow(tbl);
+        int result = VirtualTaskmaster.tblFindEmptyRow(tbl);
         assertEquals(expResult, result);
         System.out.println("PASSED");
     }
@@ -72,25 +72,25 @@ public class VTasksManagerTest {
         String time = "12";
         boolean minute = false;
         int expResult = 0;
-        int result = VTasksManager.getHour(time, minute);
+        int result = VirtualTaskmaster.getHour(time, minute);
         assertEquals(expResult, result);
         time = "1234";
-        result = VTasksManager.getHour(time, minute);
+        result = VirtualTaskmaster.getHour(time, minute);
         expResult = 1;
         assertEquals(expResult, result);
         time = "1234";
         minute = true;
-        result = VTasksManager.getHour(time, minute);
+        result = VirtualTaskmaster.getHour(time, minute);
         expResult = 34 ;
         assertEquals(expResult, result);
         time = "12345";
         expResult = 45;
-        result = VTasksManager.getHour(time, minute);
+        result = VirtualTaskmaster.getHour(time, minute);
         assertEquals(expResult, result);
         time = "12345";
         minute = false;
         expResult = 12;
-        result = VTasksManager.getHour(time, minute);
+        result = VirtualTaskmaster.getHour(time, minute);
         assertEquals(expResult, result);
         System.out.println("PASSED");
     }

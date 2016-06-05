@@ -2,7 +2,6 @@ package pl.edu.agh.fis.vtaskmaster;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.lang.Integer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -212,38 +211,6 @@ public class VTasksManager extends JDialog {
 		
 		btnFavourites = new JButton("Favourites");
 		btnFavourites.setBounds(157, 235, 124, 25);
-		contentPane.add(btnFavourites);
-		
-	}
-	/**
-	 * 
-	 * @param tbl - table to find empty row in
-	 * @return i - index of empty row in the given table
-	 */
-	static protected int tblFindEmptyRow(JTable tbl) {
-		int i = 0;
-		while(tbl.getValueAt(i,0) != null) i++;
-		return i;
-	}
-	/**
-	 * 
-	 * @param time - String representation of time to be parsed to int
-	 * @param minute - defines if method should return minutes/true or hours/false
-	 * @return int time-elem - number of minutes and hours
-	 */
-	static int getHour(String time, boolean minute) {
-		if(time.length() == 5 && minute){
-			return ((Integer.parseInt((new Character(time.charAt(3)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(4)).toString())));
-		}
-		else if(time.length() == 4 && minute){
-			return ((Integer.parseInt((new Character(time.charAt(2)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(3)).toString())));
-		}
-		else if(time.length() == 5 && !minute){
-			return ((Integer.parseInt((new Character(time.charAt(0)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(1)).toString())));
-		}
-		else if(time.length() == 4 && !minute){
-			return ((Integer.parseInt((new Character(time.charAt(0)).toString()))));
-		}
-		return 0;
+		contentPane.add(btnFavourites);	
 	}
 }
