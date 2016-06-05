@@ -399,6 +399,7 @@ public class CoreDBTest {
         assertTrue(task.isDone());
 
         assertEquals(db.getExecutedTasksDone().size(), 1);
+        System.out.println(db.getExecutedTasksDone());
     }
 
     @Test

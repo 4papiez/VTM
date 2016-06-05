@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import pl.edu.agh.fis.vtaskmaster.VTaskControlWindow.VTCState;
 import pl.edu.agh.fis.vtaskmaster.VTasksManager.returnState;
 import pl.edu.agh.fis.vtaskmaster.core.CoreManager;
+import pl.edu.agh.fis.vtaskmaster.core.CoreStats;
 import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
 import pl.edu.agh.fis.vtaskmaster.core.model.Task;
 
@@ -33,6 +35,7 @@ public class VirtualTaskmaster {
     private long[] currTime;
     private long[] startTime;
     private long[] elapsedTime;
+    private int[] id;
     private Timer tmrMin;
     String sep;
 
@@ -71,6 +74,7 @@ public class VirtualTaskmaster {
         currTime = new long[5];
         elapsedTime = new long[5];
         startTime = new long[5];
+        id = new int[5];
         state = new VTaskControlWindow.VTCState[5];
         sep = System.getProperty("file.separator");
         for (int i = 0; i < 5; i++)
@@ -148,16 +152,38 @@ public class VirtualTaskmaster {
         	@Override
         	public void mouseClicked(MouseEvent e) {
         		//TODO replace "0" with proper getter converted to String
-        	    vTS.lblEffectivenessV = new JLabel("0");
-        	    vTS.lblEffectivenessFavV = new JLabel("0");
-     	        vTS.lblEffectivenessNFavV = new JLabel("0");
-     	        vTS.lblOnTimeV = new JLabel("0");
-     	        vTS.lblDifferenceV = new JLabel("0");
-     	        vTS.lblDifferenceProcV = new JLabel("0");
-     	        vTS.lblTaskCountV = new JLabel("0");
-     	        vTS.lblTimeCountV = new JLabel("0");
-     	        vTS.lblAvgPriorV = new JLabel("0");
-        		vTS.setVisible(true);
+                try {
+                    vTS.lblEffectivenessV.setText(
+                            String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.ALL))
+                    );
+                    vTS.lblEffectivenessFavV.setText(
+                            String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.FAVOURITES))
+                    );
+                    vTS.lblEffectivenessNFavV.setText(
+                            String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.NON_FAVOURITES))
+                    );
+                    vTS.lblOnTimeV.setText(
+                            String.valueOf(database.stats.onTime())
+                    );
+                    vTS.lblDifferenceV.setText(
+                            String.valueOf(database.stats.averageDifference(true))
+                    );
+                    vTS.lblDifferenceProcV.setText(
+                            String.valueOf(database.stats.averageDifference(false)) + "%"
+                    );
+                    vTS.lblTaskCountV.setText(
+                            String.valueOf(database.stats.numberOfDoneTasks())
+                    );
+                    vTS.lblTimeCountV.setText(
+                            String.valueOf(database.stats.timeSpentWorking())
+                    );
+                    vTS.lblAvgPriorV.setText(
+                            String.valueOf(database.stats.averagePriority())
+                    );
+                    vTS.setVisible(true);
+                } catch(SQLException exception) {
+                    System.err.println("Blad odczytu statystyk z bazy danych.");
+                }
         	}
         });
         /**
@@ -334,7 +360,9 @@ public class VirtualTaskmaster {
     void VTMainWindowDeleteButton(){
 		int selRow = vTMW.tblToDo.getSelectedRow();
         if (selRow != -1 && vTMW.tblToDo.getValueAt(selRow, 0) != null) {
-        	database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)).setTodo(false);
+        	Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+            task.setTodo(false);
+            database.saveTask(task);
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
@@ -522,15 +550,16 @@ public class VirtualTaskmaster {
     void VTaskControlWindowStopButton(int winIndx){
     	state[winIndx] = VTCState.vtcwFinished; vtcwTab[winIndx].active = false; vtcwTab[winIndx].setVisible(false);
         elapsedTime[winIndx] = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
-        vtcwTab[winIndx] = new VTaskControlWindow("empty slot", "00", "00");
-        vTMW.vtcwLblTab[winIndx].setText("Empty slot");
         ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
         for(int j = 0; j < tasks.size(); j++){
-        	if(tasks.get(j).getTaskName() == vtcwTab[winIndx].lblVTaskName.getText() && !(tasks.get(j).isDone())){
+            System.out.println(tasks.get(j).getTaskName() + vtcwTab[winIndx].lblVTaskName.getText());
+        	if(tasks.get(j).getTaskName().equals(vtcwTab[winIndx].lblVTaskName.getText()) && !(tasks.get(j).isDone())){
         		database.finishTask(tasks.get(j), System.currentTimeMillis());
         		break;
         	}
         }
+        vtcwTab[winIndx] = new VTaskControlWindow("empty slot", "00", "00");
+        vTMW.vtcwLblTab[winIndx].setText("Empty slot");
     }
     /**
      * Behavior of PlayButton in TaskControlWindow
@@ -603,7 +632,7 @@ public class VirtualTaskmaster {
     void handleVTCW(int h, int min, String task, int prior){
         int handler = findEmptyHandler();
         if(handler != -1){
-            vtcwTab[handler].setTask(""+task+"("+prior+")",
+            vtcwTab[handler].setTask(task,
                     VTMainWindow.timeFiller(h),
                     VTMainWindow.timeFiller(min));
             vtcwTab[handler].setAlwaysOnTop(true);
