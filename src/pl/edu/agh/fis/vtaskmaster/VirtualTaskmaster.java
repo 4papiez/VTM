@@ -640,7 +640,7 @@ public class VirtualTaskmaster {
     void handleVTCW(int h, int min, String task, int prior){
         int handler = findEmptyHandler();
         if(handler != -1){
-            vtcwTab[handler].setTask(task,
+            vtcwTab[handler].setTask("("+prior+")"+task,
                     VTMainWindow.timeFiller(h),
                     VTMainWindow.timeFiller(min));
             vtcwTab[handler].setAlwaysOnTop(true);
