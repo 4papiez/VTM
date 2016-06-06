@@ -72,11 +72,17 @@ public class VirtualTaskmasterTest {
     @Test
     public void testCountDownTime() {
         System.out.println("countDownTime");
-        fail("This is prototype!");
         int winIndx = 0;
         boolean retHourTxt = false;
         VirtualTaskmaster instance = new VirtualTaskmaster();
-        String expResult = "0-224409787";
+        String expResult = instance.countDownTime(winIndx,retHourTxt);
+        Long num = Long.parseLong(expResult)+1;
+        expResult = num.toString();
+        try{
+            Thread.sleep(60000);
+        }catch (Throwable e){
+            System.out.println("Exception: "+e);
+        }
         String result = instance.countDownTime(winIndx, retHourTxt);
         assertEquals(expResult, result);
         System.out.println("PASSED");
@@ -102,19 +108,29 @@ public class VirtualTaskmasterTest {
      */
     @Test
     public void testValidateDataVTM() {
-    	/*
-        System.out.println("validateDataVTM");
-        int h = 0;
+    	 System.out.println("validateDataVTM");
+        int h = 1;
         int min = 0;
-        String name = "";
-        String desc = "";
+        String name = "Test";
+        String desc = "Test Description";
         VirtualTaskmaster instance = new VirtualTaskmaster();
-        boolean expResult = false;
+        boolean expResult = true;
         boolean result = instance.validateDataVTM(h, min, name, desc);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-        */
+        h=0;
+        min=0;
+        expResult = false;
+        result = instance.validateDataVTM(h, min, name, desc);
+        assertEquals(expResult, result);
+        h=1;
+        name="";
+        result = instance.validateDataVTM(h, min, name, desc);
+        assertEquals(expResult, result);
+        name="Test";
+        desc="";
+        result = instance.validateDataVTM(h, min, name, desc);
+        assertEquals(expResult, result);
+        System.out.println("PASSED");
     }
 
     /**
@@ -122,15 +138,15 @@ public class VirtualTaskmasterTest {
      */
     @Test
     public void testFillTable() {
-    	/*
-        System.out.println("fillTable");
-        JTable tbl = null;
-        ArrayList<Task> task = null;
+    	 System.out.println("fillTable");
+        VTasksManager vtm = new VTasksManager();
+        JTable tbl = vtm.tblFavourites;
+        Task e = new Task("Test","",1,1,true,true);
+        ArrayList<Task> task = new ArrayList<Task>();
+        task.add(e);
         VirtualTaskmaster instance = new VirtualTaskmaster();
         instance.fillTable(tbl, task);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-        */
+        System.out.println("PASSED");
     }
     
 }
