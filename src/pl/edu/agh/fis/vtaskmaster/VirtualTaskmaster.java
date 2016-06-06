@@ -422,7 +422,11 @@ public class VirtualTaskmaster {
                 if(database.getTaskByName(vTM.textField.getText()) == null){
                 	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                 }
-                database.getTaskByName(vTM.textField.getText()).setTodo(true);
+                Task why = database.getTaskByName(vTM.textField.getText());
+                database.removeTaskByName(vTM.textField.getText());
+                why.setTodo(true);
+                database.saveTask(why);
+                System.out.println("TODO " + vTM.textField.getText());
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
@@ -731,6 +735,7 @@ public class VirtualTaskmaster {
 				tbl.setValueAt(task.getPriority(), i, 1);
 				tbl.setValueAt(th+":"+tm, i, 2);
 				tbl.setValueAt(th+":"+tm, i, 3);
+				System.out.println(task.getName() + " " + task.isTodo());
 		}
 	}
 	/**
