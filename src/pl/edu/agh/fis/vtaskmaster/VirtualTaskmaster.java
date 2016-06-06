@@ -570,6 +570,7 @@ public class VirtualTaskmaster {
     	state[winIndx] = VTCState.vtcwStarted;
         currTime[winIndx] = System.currentTimeMillis();
         startTime[winIndx] = currTime[winIndx];
+        System.out.println(System.getProperty("user.dir"));
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
     }
     /**

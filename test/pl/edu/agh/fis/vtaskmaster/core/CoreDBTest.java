@@ -102,6 +102,7 @@ public class CoreDBTest {
         Task task = new Task("Test", "", 1, 1, true, true);
         db.addTask(task);
         db.addExecutedTask(task, 0);
+
         etask.setElapsedTime(15);
         boolean expResult = true;
         boolean result = db.updateExecutedTask(etask);
@@ -116,12 +117,15 @@ public class CoreDBTest {
     @Test
     public void testAddExecutedTask() throws Exception {
         Task task = new Task("Test", "Testing", 1, 1, true, true);
-        boolean expResult = true;
 
         db.addTask(task);
-        boolean result = db.addExecutedTask(task, 25);
 
-        assertEquals(expResult, result);
+        int id1 = db.addExecutedTask(task, 25);
+        int id2 = db.addExecutedTask(task, 61);
+
+        assertNotEquals(id1, id2);
+        assertEquals(id1, 1);
+        assertEquals(id2, 2);
     }
 
     /**

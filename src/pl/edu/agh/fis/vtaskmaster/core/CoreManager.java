@@ -185,18 +185,17 @@ public class CoreManager {
      *
      * @param task task which you want to start executing
      * @param startTime here you should pass current time
-     * @return Boolean - true on success and false on failure
+     * @return id of executedTask if succeed or -1 on failure
      *
      * @see pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask
      */
-    public boolean executeTask(Task task, long startTime) {
+    public int executeTask(Task task, long startTime) {
         try {
-            db.addExecutedTask(task, startTime);
+            return db.addExecutedTask(task, startTime);
         }
         catch (SQLException e) {
-            return false;
+            return -1;
         }
-        return true;
     }
 
     /**

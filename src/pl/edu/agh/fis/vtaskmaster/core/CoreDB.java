@@ -334,10 +334,10 @@ public class CoreDB {
      *
      * @param task task which will be connected with created ExecutedTask
      * @param startTime time in ms since Jan 1, 1970
-     * @return true if the operation went positive, false otherwise
+     * @return id of new executedTask
      * @throws SQLException
      */
-    public boolean addExecutedTask(Task task, long startTime) throws SQLException {
+    public int addExecutedTask(Task task, long startTime) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
         );
@@ -349,7 +349,7 @@ public class CoreDB {
         preparedStatement.setBoolean(5, false);
         preparedStatement.execute();
 
-        return true;
+       return preparedStatement.getGeneratedKeys().getInt(1);
     }
 
     /**
