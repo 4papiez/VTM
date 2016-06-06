@@ -375,6 +375,18 @@ public class VirtualTaskmaster {
                         (int)vTM.spnr_mint.getValue(),
                         vTM.textField.getText(),
                         (int)vTM.spnr_prior.getValue());
+                int row = tblFindEmptyRow(vTM.tblHistory);
+    	        if(vTM.tblHistory.getValueAt(row, 0) == null){
+    	            ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
+    	        }
+    	        vTM.tblHistory.setValueAt(vTM.textField.getText(),row,0);
+    	        vTM.tblHistory.setValueAt(vTM.spnr_prior.getValue(),row,1);
+    	        if((int)(vTM.spnr_mint.getValue()) > 9){
+    	            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":"+vTM.spnr_mint.getValue(),row,2);
+    	        }
+    	        else{
+    	            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
+    	        }
                 if(database.getTaskByName(vTM.textField.getText()) == null){
                 	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                 }
@@ -382,6 +394,7 @@ public class VirtualTaskmaster {
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
+            
         }else if(vTM.rS == returnState.VTM_TODO){
             if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
                 int eRow = tblFindEmptyRow(vTMW.tblToDo);
@@ -397,18 +410,6 @@ public class VirtualTaskmaster {
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
-        }
-        int row = tblFindEmptyRow(vTM.tblHistory);
-        if(vTM.tblHistory.getValueAt(row, 0) == null){
-            ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
-        }
-        vTM.tblHistory.setValueAt(vTM.textField.getText(),row,0);
-        vTM.tblHistory.setValueAt(vTM.spnr_prior.getValue(),row,1);
-        if((int)(vTM.spnr_mint.getValue()) > 9){
-            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":"+vTM.spnr_mint.getValue(),row,2);
-        }
-        else{
-            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
         }
     }
     /**
