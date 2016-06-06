@@ -379,9 +379,9 @@ public class VirtualTaskmaster {
         if (selRow != -1) {
             int h = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), false);
             int min = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), true);
-            handleVTCW(h, min, (String) vTMW.tblToDo.getValueAt(selRow, 0), (int) vTMW.tblToDo.getValueAt(selRow, 1));
+            int id = database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
+            handleVTCW(h, min, (String) vTMW.tblToDo.getValueAt(selRow, 0), (int) vTMW.tblToDo.getValueAt(selRow, 1), id);
             System.out.println("name: " + (String) vTMW.tblToDo.getValueAt(selRow, 0));
-            database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         }
     }
@@ -400,10 +400,15 @@ public class VirtualTaskmaster {
 
         if(vTM.rS == returnState.VTM_RUN){
             if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
+            	if(database.getTaskByName(vTM.textField.getText()) == null){
+                	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
+                }
+                int id = database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());		
                 handleVTCW((int)vTM.spnr_hour.getValue(),
                         (int)vTM.spnr_mint.getValue(),
                         vTM.textField.getText(),
-                        (int)vTM.spnr_prior.getValue());
+                        (int)vTM.spnr_prior.getValue(),
+                        id);
                 int row = tblFindEmptyRow(vTM.tblHistory);
     	        if(vTM.tblHistory.getValueAt(row, 0) == null){
     	            ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
@@ -416,10 +421,6 @@ public class VirtualTaskmaster {
     	        else{
     	            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
     	        }
-                if(database.getTaskByName(vTM.textField.getText()) == null){
-                	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
-                }
-                database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());		
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
@@ -439,7 +440,6 @@ public class VirtualTaskmaster {
                 database.removeTaskByName(vTM.textField.getText());
                 why.setTodo(true);
                 database.saveTask(why);
-                System.out.println("TODO " + vTM.textField.getText());
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
@@ -561,7 +561,7 @@ public class VirtualTaskmaster {
         ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
         for(int j = 0; j < tasks.size(); j++){
             System.out.println(tasks.get(j).getTaskName() + vtcwTab[winIndx].lblVTaskName.getText());
-        	if(tasks.get(j).getTaskName().equals(vtcwTab[winIndx].lblVTaskName.getText()) && !(tasks.get(j).isDone())){
+        	if(tasks.get(j).getId() == (vtcwTab[winIndx].getTaskId()) && !(tasks.get(j).isDone())){
         		database.finishTask(tasks.get(j), System.currentTimeMillis());
         		break;
         	}
@@ -602,7 +602,7 @@ public class VirtualTaskmaster {
                 
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
-                	if(tasks.get(j).getTaskName() == vtcwTab[i].lblVTaskName.getText() && !(tasks.get(j).isDone())){
+                	if(tasks.get(j).getId() == (vtcwTab[i].getTaskId()) && !(tasks.get(j).isDone())){
                 		database.updateExecutedTask(tasks.get(j));
                 	}
                 }
@@ -638,12 +638,13 @@ public class VirtualTaskmaster {
      * @param task - user-typed task description
      * @param prior - user-chosen priority of the task
      */
-    void handleVTCW(int h, int min, String task, int prior){
+    void handleVTCW(int h, int min, String task, int prior, int id){
         int handler = findEmptyHandler();
         if(handler != -1){
             vtcwTab[handler].setTask("("+prior+")"+task,
                     VTMainWindow.timeFiller(h),
-                    VTMainWindow.timeFiller(min));
+                    VTMainWindow.timeFiller(min),
+                    id);
             vtcwTab[handler].setAlwaysOnTop(true);
             vtcwTab[handler].setVisible(true);
             vtcwTab[handler].active = true;

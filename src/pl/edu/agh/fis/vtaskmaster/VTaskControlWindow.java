@@ -34,6 +34,7 @@ public class VTaskControlWindow extends JDialog {
 	boolean active;
 	Timer tmrH;
 	String sep;
+	private int taskId;
 	/**
 	 * Launch the application.
 	 */
@@ -59,6 +60,7 @@ public class VTaskControlWindow extends JDialog {
 		setResizable(false);
 		
 		sep = System.getProperty("file.separator");
+		taskId = -1;
 		
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 294, 77);
@@ -107,9 +109,13 @@ public class VTaskControlWindow extends JDialog {
 		contentPane.add(lblInProgress);
 		
 	}
-	void setTask(String taskName, String taskTimeHours, String taskTimeMins){
+	void setTask(String taskName, String taskTimeHours, String taskTimeMins, int id){
 		lblVTaskName.setText(taskName);
 		lblVTimeHours.setText(taskTimeHours);
 		lblVTimeMinutes.setText(taskTimeMins);
+		taskId = id;
+	}
+	int getTaskId(){
+		return taskId;
 	}
 }
