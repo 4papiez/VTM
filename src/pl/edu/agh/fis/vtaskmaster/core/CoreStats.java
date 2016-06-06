@@ -100,7 +100,9 @@ public class CoreStats {
                     onTime++;
             }
         }
-
+        if(onTime == 0) {
+            return 0;
+        }
         return (float) onTime / (float) allDoneTasks * 100;
     }
 
@@ -185,7 +187,9 @@ public class CoreStats {
             sum += priority;
             counter++;
         }
-
+        if(counter == 0) {
+            return 0;
+        }
         return sum / counter;
     }
 

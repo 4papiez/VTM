@@ -1,6 +1,8 @@
 package pl.edu.agh.fis.vtaskmaster.core.model;
 
-
+/**
+ * Model Task. Treated as proxy between db and application.
+ */
 public class Task {
     private String name;
     private String oldName;

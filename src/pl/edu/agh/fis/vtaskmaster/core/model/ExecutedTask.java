@@ -1,6 +1,8 @@
 package pl.edu.agh.fis.vtaskmaster.core.model;
 
-
+/**
+ * Model ExecutedTask. Treated as proxy between db and application.
+ */
 public class ExecutedTask {
     private int id;
     private String taskName;

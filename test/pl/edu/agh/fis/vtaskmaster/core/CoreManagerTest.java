@@ -51,14 +51,12 @@ public class CoreManagerTest {
     @Test
     public void testGetAllTasks() {
         System.out.println("GetAllTasks()");
-        instance= new CoreManager (NAME);
         Task task = new Task("Test","",1,1,true,true);
         ArrayList<Task> expResult= new ArrayList();
         expResult.add(task);
         instance.saveTask(task);
         ArrayList<Task> result = instance.getAllTasks();
         assertEquals(expResult.toString(), result.toString());
-        instance.cleardb();
         System.out.println(" PASSED");
     }
 
@@ -68,7 +66,6 @@ public class CoreManagerTest {
     @Test
     public void testGetAllExecutedTasks() {
         System.out.println("getAllExecutedTasks");
-        instance = new CoreManager(NAME);
         ArrayList<ExecutedTask> expResult = new ArrayList(1);
         expResult.add(new ExecutedTask(1,"Test",0,0,0,false));
         Task task = new Task("Test","",1,1,true,true);
@@ -76,7 +73,6 @@ public class CoreManagerTest {
         instance.executeTask(task, 0);
         ArrayList<ExecutedTask> result = instance.getAllExecutedTasks();
         assertEquals(expResult.get(0).toString(), result.get(0).toString());
-        instance.cleardb();
         System.out.println(" PASSED ");
         
     }
@@ -89,11 +85,9 @@ public class CoreManagerTest {
         System.out.println("getTaskByName");
         String taskName = "Test";
         Task expResult = new Task(taskName,"",1,1,true,true);
-        instance = new CoreManager(NAME);
         instance.saveTask(expResult);
         Task result = instance.getTaskByName(taskName);
         assertEquals(expResult.toString(), result.toString());
-        instance.cleardb();
         System.out.println(" PASSED");
     }
 
@@ -106,13 +100,11 @@ public class CoreManagerTest {
         ArrayList<Task> expResult = new ArrayList();
         Task one = new Task("Test1","",1,1,true,true);
         Task two = new Task("Test2","",0,0,false,false);
-        instance = new CoreManager(NAME);
         expResult.add(one);
         instance.saveTask(one);
         instance.saveTask(two);
         ArrayList<Task> result = instance.getFavourites();
         assertEquals(expResult.toString(), result.toString());
-        instance.cleardb();
         System.out.println("PASSED");
     }
 
@@ -124,14 +116,12 @@ public class CoreManagerTest {
         System.out.println("getTodo");
         Task one = new Task("Test1","",1,1,true,true);
         Task two = new Task("Test2","",0,0,false,false);
-        instance = new CoreManager(NAME);
         instance.saveTask(one);
         instance.saveTask(two);
         ArrayList<Task> expResult = new ArrayList(1);
         expResult.add(one);
         ArrayList<Task> result = instance.getTodo();
         assertEquals(expResult.toString(), result.toString());
-        instance.cleardb();
         System.out.println(" PASSED");
         
     }
@@ -142,7 +132,6 @@ public class CoreManagerTest {
     @Test
     public void testGetHistory() {
         System.out.println("getHistory");
-        instance = new CoreManager(NAME);
         Task one = new Task("Test1","",1,1,true,true);
         Task two = new Task ("Test 2","",0,0,false,false);
         ExecutedTask eone = new ExecutedTask(1,"Test1" ,0,0,0,true);
@@ -158,7 +147,6 @@ public class CoreManagerTest {
         instance.finishTask(eone, 0);
         ArrayList<Task> result = instance.getHistory();
         assertEquals(expResult.toString(), result.toString());
-        instance.cleardb();
         System.out.println(" PASSED");
     }
 
@@ -169,7 +157,6 @@ public class CoreManagerTest {
     public void testRemoveTaskByName() {
         System.out.println("removeTaskByName");
         String taskName = "Test";
-        instance = new CoreManager(NAME);
         instance.saveTask(new Task(taskName,"",1,1,true,true));
         boolean expResult = true;
         boolean result = instance.removeTaskByName(taskName);
@@ -184,12 +171,10 @@ public class CoreManagerTest {
     public void testSaveTask() {
         System.out.println("saveTask");
         Task task = new Task("Test","",1,1,true,true);
-        CoreManager instance = new CoreManager(NAME);
         boolean expResult = true;
         boolean result = instance.saveTask(task);
         assertEquals(expResult, result);
-        instance.cleardb();
-        System.out.println(" PASSED"); 
+        System.out.println(" PASSED");
     }
 
     /**
@@ -198,14 +183,12 @@ public class CoreManagerTest {
     @Test
     public void testExecuteTask() {
         System.out.println("executeTask");
-        instance = new CoreManager(NAME);
         Task task = new Task("Test","",1,1,true,true);
         long startTime = 0L;
         boolean expResult = true;
         instance.saveTask(task);
         boolean result = instance.executeTask(task, startTime);
         assertEquals(expResult, result);
-        instance.cleardb();
         System.out.println(" PASSED ");
     }
 
@@ -215,7 +198,6 @@ public class CoreManagerTest {
     @Test
     public void testUpdateExecutedTask() {
         System.out.println("updateExecutedTask");
-        instance = new CoreManager(NAME);
         Task task = new Task ("Test", "" ,1,1,true,true);
         ExecutedTask etask = new ExecutedTask (1,"Test",0,0,0,false);
         boolean expResult = true;
@@ -223,7 +205,6 @@ public class CoreManagerTest {
         instance.executeTask(task, 0);
         boolean result = instance.updateExecutedTask(etask);
         assertEquals(expResult, result);
-        instance.cleardb();
         System.out.println(" PASSED");
     
     }
@@ -237,7 +218,6 @@ public class CoreManagerTest {
         ExecutedTask etask = new ExecutedTask(1,"Test",0,0,0,false);
         Task task = new Task("Test","",1,1,true,true);
         long endTime = 0L;
-        instance = new CoreManager(NAME);
         instance.saveTask(task);
         instance.executeTask(task, 0);
         boolean expResult = true;
@@ -249,7 +229,6 @@ public class CoreManagerTest {
         System.out.println(expected);
         System.out.println(real);
         assertEquals(expected.toString(), real.toString());
-        instance.cleardb();
         System.out.println(" PASSED");
     }
 

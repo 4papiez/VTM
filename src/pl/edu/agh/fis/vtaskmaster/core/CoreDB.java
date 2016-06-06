@@ -9,15 +9,29 @@ import java.util.ArrayList;
 
 
 public class CoreDB {
-    // sqlite driver for JDBC
+    /**
+     * sqlite driver for JDBC
+     */
     public static final String DRIVER = "org.sqlite.JDBC";
-    // address of the database
+
+    /**
+     * address of the database
+     */
     public static final String DB_URL = "jdbc:sqlite:vtaskmaster.db";
 
+    /**
+     * connection with database
+     */
     private Connection connection;
+
+    /**
+     * statement to perform requests to database
+     */
     private Statement statement;
 
-
+    /**
+     * Default constructor creates standard VTM db with name CoreDB.DB_URL.
+     */
     public CoreDB() {
         try {
             Class.forName(CoreDB.DRIVER);
@@ -41,6 +55,10 @@ public class CoreDB {
         initDB();
     }
 
+    /**
+     * Constructor creates VTM db with name given in parameter.
+     * @param dbName name of the database
+     */
     public CoreDB(String dbName) {
         try {
             Class.forName(CoreDB.DRIVER);
@@ -64,7 +82,10 @@ public class CoreDB {
         initDB();
     }
 
-    // creates tables in the database
+    /**
+     * creates tables in the database
+     * @return true if the operation went positive, false otherwise
+     */
     public boolean initDB() {
         String createTasks = "CREATE TABLE IF NOT EXISTS tasks(" +
                 "name           varchar(45)     PRIMARY KEY NOT NULL, " +
@@ -97,6 +118,10 @@ public class CoreDB {
         return true;
     }
 
+    /**
+     * Clears the database.
+     * @return true if the operation went positive, false otherwise
+     */
     public boolean clearDB() {
         String dropTasks = "DROP TABLE IF EXISTS tasks";
         String dropExecutedTasks = "DROP TABLE IF EXISTS executedTasks";
@@ -113,6 +138,12 @@ public class CoreDB {
         return true;
     }
 
+    /**
+     * Adds a task to the database.
+     * @param task task which you want to add
+     * @return true if the operation went positive, false otherwise
+     * @throws SQLException
+     */
     public boolean addTask(Task task) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO tasks VALUES (?, ?, ?, ?, ?, ?)"
@@ -128,10 +159,26 @@ public class CoreDB {
         return true;
     }
 
+    /**
+     * Removes task with given name from the database.
+     * @param taskName name of the task you want to remove
+     * @return true if the operation went positive, false otherwise
+     * @throws SQLException
+     */
     public boolean removeTaskByName(String taskName) throws SQLException {
         return statement.execute("DELETE FROM tasks WHERE name='" + taskName + "'");
     }
 
+    /**
+     * Updates a task given as parameter.
+     *
+     * Remember that task which you got from the database remembers its name, even if it was modified in runtime.
+     * You can change the name of the task and when performing this method, the right one in db will be modified.
+     *
+     * @param task task you want to update
+     * @return true if the operation went positive, false otherwise
+     * @throws SQLException
+     */
     public boolean updateTask(Task task) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "UPDATE tasks SET name = ?, description = ?, priority = ?, expectedTime = ?," +
@@ -151,6 +198,15 @@ public class CoreDB {
         return true;
     }
 
+    /**
+     * Gets task from database with given query.
+     *
+     * Example query: "SELECT * FROM tasks WHERE todo"
+     *
+     * @param query query string
+     * @return list of tasks
+     * @throws SQLException
+     */
     private ArrayList<Task> getTasksWithQuery(String query)
             throws SQLException
     {
@@ -175,22 +231,47 @@ public class CoreDB {
         return tasks;
     }
 
+    /**
+     * Gets tasks with positive todo flag.
+     * @return list of tasks
+     * @throws SQLException
+     */
     public ArrayList<Task> getTodo() throws SQLException {
         return getTasksWithQuery("SELECT * FROM tasks WHERE todo");
     }
 
+    /**
+     * Gets tasks with positive favourite flag.
+     * @return list of tasks
+     * @throws SQLException
+     */
     public ArrayList<Task> getFavourites() throws SQLException {
         return getTasksWithQuery("SELECT * FROM tasks WHERE favourite");
     }
 
+    /**
+     * Gets tasks with negative favourite flag.
+     * @return list of tasks
+     * @throws SQLException
+     */
     public ArrayList<Task> getNonFavourites() throws SQLException {
         return getTasksWithQuery("SELECT * FROM tasks WHERE NOT favourite");
     }
 
+    /**
+     * Gets all tasks from the database.
+     * @return list of tasks
+     * @throws SQLException
+     */
     public ArrayList<Task> getAllTasks() throws SQLException {
         return getTasksWithQuery("SELECT * FROM tasks");
     }
 
+    /**
+     * Gets tasks which have been already done.
+     * @return list of tasks
+     * @throws SQLException
+     */
     public ArrayList<Task> getHistory() throws SQLException {
         return getTasksWithQuery(
                 "SELECT name, description, priority, expectedTime, favourite, todo " +
@@ -199,6 +280,12 @@ public class CoreDB {
         );
     }
 
+    /**
+     * Gets a task with a given name.
+     * @param name name of the task you want to get
+     * @return task with given name
+     * @throws SQLException
+     */
     Task getTaskByName(String name) throws SQLException {
         int priority;
         boolean favourite, todo;
@@ -226,6 +313,12 @@ public class CoreDB {
         return task;
     }
 
+    /**
+     * Checks if there is a task with a given name in the database.
+     * @param taskName name to check
+     * @return true if task with given name exists, false otherwise
+     * @throws SQLException
+     */
     public boolean isTaskWithName(String taskName) throws SQLException {
         ResultSet result = statement.executeQuery(
                 "SELECT 1 FROM tasks WHERE name = '" + taskName + "'"
@@ -234,7 +327,16 @@ public class CoreDB {
         return result.next();
     }
 
-
+    /**
+     * Adds an executed task to the database.
+     *
+     * First parameter is an ordinary Task and the ExecutedTask is created with connection with it.
+     *
+     * @param task task which will be connected with created ExecutedTask
+     * @param startTime time in ms since Jan 1, 1970
+     * @return true if the operation went positive, false otherwise
+     * @throws SQLException
+     */
     public boolean addExecutedTask(Task task, long startTime) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO executedTasks VALUES (NULL, ?, ?, ?, ?, ?)"
@@ -250,6 +352,12 @@ public class CoreDB {
         return true;
     }
 
+    /**
+     * Updates given executed task. The same mechanism as in {@link #updateTask(Task)}
+     * @param task executed task you want to update
+     * @return true if the operation went positive, false otherwise
+     * @throws SQLException
+     */
     public boolean updateExecutedTask(ExecutedTask task) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "UPDATE executedTasks SET duration = ?, done = ?" +
@@ -265,10 +373,25 @@ public class CoreDB {
         return true;
     }
 
+    /**
+     * Removes given executedTask from the database.
+     * @param task executedTask you want to remove from db
+     * @return true if the operation went positive, false otherwise
+     * @throws SQLException
+     */
     public boolean removeExecutedTask(ExecutedTask task) throws SQLException{
         return statement.execute("DELETE FROM executedTasks WHERE id='" + task.getId() + "'");
     }
 
+    /**
+     * Gets executedTasks from database with given query.
+     *
+     * Example query: "SELECT * FROM executedTasks"
+     *
+     * @param query query string
+     * @return list of executed tasks
+     * @throws SQLException
+     */
     private ArrayList<ExecutedTask> getExecutedTasksWithQuery(String query)
             throws SQLException
     {
@@ -295,10 +418,21 @@ public class CoreDB {
         return tasks;
     }
 
+    /**
+     * Gets all executed tasks.
+     * @return list of all excuted tasks
+     * @throws SQLException
+     */
     public ArrayList<ExecutedTask> getAllExecutedTasks() throws SQLException {
         return getExecutedTasksWithQuery("SELECT * FROM executedTasks");
     }
 
+    /**
+     * Gets all executed tasks for task with a given name.
+     * @param name name of the task
+     * @return list of executed tasks
+     * @throws SQLException
+     */
     public ArrayList<ExecutedTask> getAllExecutedTasksForTaskWithName(String name)
         throws SQLException
     {
@@ -307,6 +441,12 @@ public class CoreDB {
         );
     }
 
+    /**
+     * Gets all executed tasks before a given date.
+     * @param date date which is upper bound
+     * @return list of executed tasks
+     * @throws SQLException
+     */
     public ArrayList<ExecutedTask> getExecutedTasksBeforeDate(long date)
         throws SQLException
     {
@@ -315,6 +455,12 @@ public class CoreDB {
         );
     }
 
+    /**
+     * Get all executed tasks after a given date.
+     * @param date date which is lower bound
+     * @return list of executed tasks
+     * @throws SQLException
+     */
     public ArrayList<ExecutedTask> getExecutedTasksAfterDate(long date)
             throws SQLException
     {
@@ -323,6 +469,11 @@ public class CoreDB {
         );
     }
 
+    /**
+     * Gets all executed tasks with positive done flag.
+     * @return list of executed tasks
+     * @throws SQLException
+     */
     public ArrayList<ExecutedTask> getExecutedTasksDone()
             throws SQLException
     {
@@ -331,6 +482,14 @@ public class CoreDB {
         );
     }
 
+    /**
+     * Gets an executed task with a given id.
+     *
+     * It's possible to get the id from {@link pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask}
+     * @param id id of executedTask
+     * @return executed task with given id
+     * @throws SQLException
+     */
     public ExecutedTask getExecutedTaskWithId(int id)
             throws SQLException
     {
@@ -354,6 +513,9 @@ public class CoreDB {
         }
     }
 
+    /**
+     * Closes connection with the database.
+     */
     public void closeConnection() {
         try {
             connection.close();
