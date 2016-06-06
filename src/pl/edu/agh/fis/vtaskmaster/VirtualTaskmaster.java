@@ -86,6 +86,7 @@ public class VirtualTaskmaster {
         database = new CoreManager();
         fillTable(vTM.tblHistory, database.getHistory());
 		fillTable(vTM.tblFavourites, database.getFavourites());
+		fillTable(vTMW.tblToDo, database.getTodo());
 
         /**
          * VirtualTaskmasterMainWindow event handlers
@@ -451,6 +452,7 @@ public class VirtualTaskmaster {
     	JTable tbl = (JTable) ((((JScrollPane) vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
         int selRow = tbl.getSelectedRow();
         if (selRow != -1 && tbl.getValueAt(selRow, 0) != null) {
+        	database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
             ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
@@ -530,6 +532,7 @@ public class VirtualTaskmaster {
         vTM.tabEdit = true;
         if(selRow != -1){
             vTM.textField.setText(tbl.getValueAt(selRow, 0).toString());
+            vTM.textPane.setText(database.getTaskByName(tbl.getValueAt(selRow, 0).toString()).getDescription());
             vTM.spnr_prior.setValue(Integer.parseInt(tbl.getValueAt(selRow, 1).toString()));
             String time = tbl.getValueAt(selRow, 2).toString();
             vTM.spnr_hour.setValue(getHour(time,false));
@@ -726,8 +729,8 @@ public class VirtualTaskmaster {
 				((DefaultTableModel) tbl.getModel()).addRow(new Object[]{null,null,null,null});
 				tbl.setValueAt(task.getName(), i, 0);
 				tbl.setValueAt(task.getPriority(), i, 1);
-				tbl.setValueAt(th+":"+tm, i, 2); // no idea how to do this properly~
-				tbl.setValueAt(th+":"+tm, i, 3); // no idea how to do this properly~
+				tbl.setValueAt(th+":"+tm, i, 2);
+				tbl.setValueAt(th+":"+tm, i, 3);
 		}
 	}
 	/**
