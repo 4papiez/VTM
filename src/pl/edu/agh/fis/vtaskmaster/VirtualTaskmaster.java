@@ -464,7 +464,19 @@ public class VirtualTaskmaster {
                     vTMW.tblToDo.setValueAt(vTM.textField.getText(), eRow, 0);
                     vTMW.tblToDo.setValueAt((int)vTM.spnr_prior.getValue(), eRow, 1);
                     vTMW.tblToDo.setValueAt(VTMainWindow.timeFiller((int)vTM.spnr_hour.getValue())+":"+ VTMainWindow.timeFiller((int)vTM.spnr_mint.getValue()), eRow, 2);
-                    vTMW.tblToDo.setValueAt("00:00", eRow, 3);
+                    try {
+                        long averageTime = database.stats.averageTimeForTaskWithName(vTM.textField.getText());
+                        int avrTimeH = (int) averageTime / 3600000; String ath;
+                        int avrTimeM = (int) ((averageTime - avrTimeH * 3600000) / 60000); String atm;
+                        if (avrTimeH < 10) ath = 0 + "" + avrTimeH;
+                        else ath = "" + avrTimeH;
+                        if (avrTimeM < 10) atm = 0 + "" + avrTimeM;
+                        else atm = "" + avrTimeM;
+
+                        vTM.tblHistory.setValueAt(ath + ":" + atm, eRow, 3);
+                    } catch(SQLException exception) {
+                        vTMW.tblToDo.setValueAt("00:00", eRow, 3);
+                    }
                     Task why = database.getTaskByName(vTM.textField.getText());
                     why.setTodo(true);
                     database.saveTask(why);
