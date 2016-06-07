@@ -62,7 +62,7 @@ public class VirtualTaskmasterTest {
         String task = "";
         int prior = 1;
         VirtualTaskmaster instance = new VirtualTaskmaster();
-        instance.handleVTCW(h, min, task, prior);
+        instance.handleVTCW(h, min, task, prior, 1);
         System.out.println("PASSED");
     }
 

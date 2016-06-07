@@ -187,8 +187,8 @@ public class CoreManagerTest {
         long startTime = 0L;
         boolean expResult = true;
         instance.saveTask(task);
-        boolean result = instance.executeTask(task, startTime);
-        assertEquals(expResult, result);
+        int result = instance.executeTask(task, startTime);
+        assertEquals(1, result);
         System.out.println(" PASSED ");
     }
 

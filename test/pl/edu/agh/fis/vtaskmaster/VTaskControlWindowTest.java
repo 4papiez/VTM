@@ -58,7 +58,7 @@ public class VTaskControlWindowTest {
         String taskTimeHours = "1";
         String taskTimeMins = "1";
         VTaskControlWindow instance = new VTaskControlWindow(taskName,taskTimeHours,taskTimeMins);
-        instance.setTask(taskName, taskTimeHours, taskTimeMins);
+        instance.setTask(taskName, taskTimeHours, taskTimeMins, 1);
         System.out.println("PASSED");
     }
     

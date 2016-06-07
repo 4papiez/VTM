@@ -35,6 +35,7 @@ public class VirtualTaskmaster {
     private long[] currTime;
     private long[] startTime;
     private long[] elapsedTime;
+    private long[] accumulatedTime;
     private int[] id;
     private Timer tmrMin;
     String sep;
@@ -74,6 +75,7 @@ public class VirtualTaskmaster {
         currTime = new long[5];
         elapsedTime = new long[5];
         startTime = new long[5];
+        accumulatedTime = new long[5];
         id = new int[5];
         state = new VTaskControlWindow.VTCState[5];
         sep = System.getProperty("file.separator");
@@ -570,6 +572,7 @@ public class VirtualTaskmaster {
         }
         vtcwTab[winIndx] = new VTaskControlWindow("empty slot", "00", "00");
         vTMW.vtcwLblTab[winIndx].setText("Empty slot");
+        accumulatedTime[winIndx] = 0;
     }
     /**
      * Behavior of PlayButton in TaskControlWindow
@@ -580,7 +583,6 @@ public class VirtualTaskmaster {
     	state[winIndx] = VTCState.vtcwStarted;
         currTime[winIndx] = System.currentTimeMillis();
         startTime[winIndx] = currTime[winIndx];
-        System.out.println(System.getProperty("user.dir"));
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
     }
     /**
@@ -589,6 +591,7 @@ public class VirtualTaskmaster {
      * @param winIndx index of window in table
      */
     void VTaskControlWindowPauseButton(int winIndx){
+        accumulatedTime[winIndx] += currTime[winIndx] - startTime[winIndx];
     	state[winIndx] = VTCState.vtcwPaused;
         elapsedTime[winIndx] = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
@@ -605,7 +608,9 @@ public class VirtualTaskmaster {
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getId() == (vtcwTab[i].getTaskId()) && !(tasks.get(j).isDone())){
-                		database.updateExecutedTask(tasks.get(j));
+                        ExecutedTask executedTask = tasks.get(j);
+                        executedTask.setElapsedTime(accumulatedTime[i] + currTime[i] - startTime[i]);
+                        database.updateExecutedTask(tasks.get(j));
                 	}
                 }
             }
@@ -740,7 +745,6 @@ public class VirtualTaskmaster {
 				tbl.setValueAt(task.getPriority(), i, 1);
 				tbl.setValueAt(th+":"+tm, i, 2);
 				tbl.setValueAt(th+":"+tm, i, 3);
-				System.out.println(task.getName() + " " + task.isTodo());
 		}
 	}
 	/**
