@@ -346,10 +346,14 @@ public class VirtualTaskmaster {
     void VTMainWindowDeleteButton(){
         int selRow = vTMW.tblToDo.getSelectedRow();
         if (selRow != -1 && vTMW.tblToDo.getValueAt(selRow, 0) != null) {
-            Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
-            task.setTodo(false);
-            database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
-            database.saveTask(task);
+            if(!database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)).isFavourite()){
+                database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+            } else {
+                Task why = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+                database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+                why.setTodo(false);
+                database.saveTask(why);
+            }
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
@@ -461,7 +465,14 @@ public class VirtualTaskmaster {
         JTable tbl = (JTable) ((((JScrollPane) vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
         int selRow = tbl.getSelectedRow();
         if (selRow != -1 && tbl.getValueAt(selRow, 0) != null) {
-            database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+            if(!database.getTaskByName((String) tbl.getValueAt(selRow, 0)).isTodo()){
+                database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+            } else {
+                Task why = database.getTaskByName((String) tbl.getValueAt(selRow, 0));
+                database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+                why.setFavourite(false);
+                database.saveTask(why);
+            }
             ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
