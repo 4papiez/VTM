@@ -1,5 +1,4 @@
 package pl.edu.agh.fis.vtaskmaster;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,17 +6,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import pl.edu.agh.fis.vtaskmaster.VTaskControlWindow.VTCState;
 import pl.edu.agh.fis.vtaskmaster.VTasksManager.returnState;
 import pl.edu.agh.fis.vtaskmaster.core.CoreManager;
 import pl.edu.agh.fis.vtaskmaster.core.CoreStats;
 import pl.edu.agh.fis.vtaskmaster.core.model.ExecutedTask;
 import pl.edu.agh.fis.vtaskmaster.core.model.Task;
-
 /**
  * @author Grzegorz Burzynski
  * @author Kamil Piastowicz
@@ -25,7 +21,6 @@ import pl.edu.agh.fis.vtaskmaster.core.model.Task;
  * @version 1.0
  */
 public class VirtualTaskmaster {
-
     private VTMainWindow vTMW;
     private VTasksManager vTM;
     private VTStats vTS;
@@ -35,11 +30,10 @@ public class VirtualTaskmaster {
     private long[] currTime;
     private long[] startTime;
     private long[] elapsedTime;
+    private long[] accumulatedTime;
     private int[] id;
     private Timer tmrMin;
     String sep;
-
-
     /**
      * Launch the application.
      */
@@ -55,14 +49,12 @@ public class VirtualTaskmaster {
             }
         });
     }
-
     /**
      * Create the application.
      */
     public VirtualTaskmaster() {
         initialize();
     }
-
     /**
      * Initialize the components controlled.
      */
@@ -74,20 +66,18 @@ public class VirtualTaskmaster {
         currTime = new long[5];
         elapsedTime = new long[5];
         startTime = new long[5];
+        accumulatedTime = new long[5];
         id = new int[5];
         state = new VTaskControlWindow.VTCState[5];
         sep = System.getProperty("file.separator");
         for (int i = 0; i < 5; i++)
             vtcwTab[i] = new VTaskControlWindow("empty slot", "00", "00");
-
-
         vTM.setModal(true);
         vTM.setVisible(false);
         database = new CoreManager();
         fillTable(vTM.tblHistory, database.getHistory());
-		fillTable(vTM.tblFavourites, database.getFavourites());
-		fillTable(vTMW.tblToDo, database.getTodo());
-
+        fillTable(vTM.tblFavourites, database.getFavourites());
+        fillTable(vTMW.tblToDo, database.getTodo());
         /**
          * VirtualTaskmasterMainWindow event handlers
          */
@@ -106,7 +96,7 @@ public class VirtualTaskmaster {
         vTMW.btnManageTasks.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                VTMainWindowManageTasksButton();    
+                VTMainWindowManageTasksButton();
             }
         });
         vTMW.vtcwBtnTab[0].addMouseListener(new MouseAdapter() {
@@ -150,9 +140,9 @@ public class VirtualTaskmaster {
             }
         });
         vTMW.btnStats.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        		//TODO replace "0" with proper getter converted to String
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //TODO replace "0" with proper getter converted to String
                 try {
                     vTS.lblEffectivenessV.setText(
                             String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.ALL))
@@ -185,13 +175,13 @@ public class VirtualTaskmaster {
                 } catch(SQLException exception) {
                     System.err.println("Blad odczytu statystyk z bazy danych.");
                 }
-        	}
+            }
         });
         /**
          * VirtualTasksManager event handlers
          */
         vTM.btnDelete.addMouseListener(new MouseAdapter() {
-        	public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 VTasksManagerDeleteButton();
             }
         });
@@ -219,7 +209,7 @@ public class VirtualTaskmaster {
             @Override
             public void mouseClicked(MouseEvent e) {
                 VTasksManagerToListButton();
-                
+
             }
         });
         vTM.btnFromList.addMouseListener(new MouseAdapter() {
@@ -228,22 +218,21 @@ public class VirtualTaskmaster {
                 VTasksManagerFromListButton();
             }
         });
-        
+
         /**
          * VTaskControlWindow event handlers
          */
-        tmrMin = new Timer(60000, new ActionListener() {
+        tmrMin = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 timerAction();
             }
         });
         tmrMin.start();
-
         MouseAdapter mAdapterPlay = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPlayButton(0);
+                VTaskControlWindowPlayButton(0);
             }
         };
         MouseAdapter mAdapterPause = new MouseAdapter() {
@@ -261,7 +250,6 @@ public class VirtualTaskmaster {
         vtcwTab[0].VTPlay.addMouseListener(mAdapterPlay);
         vtcwTab[0].VTPause.addMouseListener(mAdapterPause);
         vtcwTab[0].VTStop.addMouseListener(mAdapterStop);
-
         mAdapterPlay = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -271,7 +259,7 @@ public class VirtualTaskmaster {
         mAdapterPause = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPauseButton(1);
+                VTaskControlWindowPauseButton(1);
             }
         };
         mAdapterStop = new MouseAdapter(){
@@ -283,67 +271,64 @@ public class VirtualTaskmaster {
         vtcwTab[1].VTPlay.addMouseListener(mAdapterPlay);
         vtcwTab[1].VTPause.addMouseListener(mAdapterPause);
         vtcwTab[1].VTStop.addMouseListener(mAdapterStop);
-
         mAdapterPlay = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPlayButton(2);
+                VTaskControlWindowPlayButton(2);
             }
         };
         mAdapterPause = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPauseButton(2);
+                VTaskControlWindowPauseButton(2);
             }
         };
         mAdapterStop = new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-            	 VTaskControlWindowStopButton(2);
+                VTaskControlWindowStopButton(2);
             }
         };
         vtcwTab[2].VTPlay.addMouseListener(mAdapterPlay);
         vtcwTab[2].VTPause.addMouseListener(mAdapterPause);
         vtcwTab[2].VTStop.addMouseListener(mAdapterStop);
-
         mAdapterPlay = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPlayButton(3);
+                VTaskControlWindowPlayButton(3);
             }
         };
         mAdapterPause = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPauseButton(3);
+                VTaskControlWindowPauseButton(3);
             }
         };
         mAdapterStop = new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-            	 VTaskControlWindowStopButton(3);
+                VTaskControlWindowStopButton(3);
             }
         };
         vtcwTab[3].VTPlay.addMouseListener(mAdapterPlay);
         vtcwTab[3].VTPause.addMouseListener(mAdapterPause);
         vtcwTab[3].VTStop.addMouseListener(mAdapterStop);
-
         mAdapterPlay = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPlayButton(4);
+                VTaskControlWindowPlayButton(4);
             }
         };
         mAdapterPause = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	VTaskControlWindowPauseButton(4);
+                VTaskControlWindowPauseButton(4);
             }
         };
         mAdapterStop = new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-            	 VTaskControlWindowStopButton(4);
+                VTaskControlWindowStopButton(4);
             }
         };
         vtcwTab[4].VTPlay.addMouseListener(mAdapterPlay);
@@ -359,9 +344,9 @@ public class VirtualTaskmaster {
      *  TODO flag todo should be unset in database
      */
     void VTMainWindowDeleteButton(){
-		int selRow = vTMW.tblToDo.getSelectedRow();
+        int selRow = vTMW.tblToDo.getSelectedRow();
         if (selRow != -1 && vTMW.tblToDo.getValueAt(selRow, 0) != null) {
-        	Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+            Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             task.setTodo(false);
             database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             database.saveTask(task);
@@ -369,14 +354,14 @@ public class VirtualTaskmaster {
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
         }
-	}
+    }
     /**
      *  Behavior of run button in main window
      *  checks which row is selected, than sends data to
      *  Control Window and adds executed task to database
      */
     void VTMainWindowRunButton(){
-    	int selRow = vTMW.tblToDo.getSelectedRow();
+        int selRow = vTMW.tblToDo.getSelectedRow();
         if (selRow != -1) {
             int h = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), false);
             int min = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), true);
@@ -388,7 +373,6 @@ public class VirtualTaskmaster {
             database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             database.saveTask(task);
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
-            ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         }
     }
     /**
@@ -398,39 +382,38 @@ public class VirtualTaskmaster {
      *  RUN:
      *  gets user input and handles, enabling ControlWindow
      *  toDo
-     *  Copying user input into todo table 
+     *  Copying user input into todo table
      */
     void VTMainWindowManageTasksButton(){
-    	vTM.rS = returnState.VTM_REJECTED;
+        vTM.rS = returnState.VTM_REJECTED;
         vTM.setVisible(true);
-
         if(vTM.rS == returnState.VTM_RUN){
             if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
-            	if(database.getTaskByName(vTM.textField.getText()) == null){
-                	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
+                if(database.getTaskByName(vTM.textField.getText()) == null){
+                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                 }
-                int id = database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());		
+                int id = database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());
                 handleVTCW((int)vTM.spnr_hour.getValue(),
                         (int)vTM.spnr_mint.getValue(),
                         vTM.textField.getText(),
                         (int)vTM.spnr_prior.getValue(),
                         id);
                 int row = tblFindEmptyRow(vTM.tblHistory);
-    	        if(vTM.tblHistory.getValueAt(row, 0) == null){
-    	            ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
-    	        }
-    	        vTM.tblHistory.setValueAt(vTM.textField.getText(),row,0);
-    	        vTM.tblHistory.setValueAt(vTM.spnr_prior.getValue(),row,1);
-    	        if((int)(vTM.spnr_mint.getValue()) > 9){
-    	            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":"+vTM.spnr_mint.getValue(),row,2);
-    	        }
-    	        else{
-    	            vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
-    	        }
+                if(vTM.tblHistory.getValueAt(row, 0) == null){
+                    ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
+                }
+                vTM.tblHistory.setValueAt(vTM.textField.getText(),row,0);
+                vTM.tblHistory.setValueAt(vTM.spnr_prior.getValue(),row,1);
+                if((int)(vTM.spnr_mint.getValue()) > 9){
+                    vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":"+vTM.spnr_mint.getValue(),row,2);
+                }
+                else{
+                    vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
+                }
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
-            
+
         }else if(vTM.rS == returnState.VTM_TODO){
             if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
                 int eRow = tblFindEmptyRow(vTMW.tblToDo);
@@ -440,30 +423,32 @@ public class VirtualTaskmaster {
                 vTMW.tblToDo.setValueAt(VTMainWindow.timeFiller((int)vTM.spnr_hour.getValue())+":"+ VTMainWindow.timeFiller((int)vTM.spnr_mint.getValue()), eRow, 2);
                 vTMW.tblToDo.setValueAt("00:00", eRow, 3);
                 if(database.getTaskByName(vTM.textField.getText()) == null){
-                	database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
+                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
                 }
                 Task why = database.getTaskByName(vTM.textField.getText());
                 database.removeTaskByName(vTM.textField.getText());
                 why.setTodo(true);
                 database.saveTask(why);
+                VTMainWindowManageTasksButton();
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
+                VTMainWindowManageTasksButton();
             }
         }
     }
     /**
      *  VTasksManager functions
      */
-    
+
     /**
      * Behavior of Delete button in TasksManager
      * finds selected row, and removes it
      */
     void VTasksManagerDeleteButton(){
-    	JTable tbl = (JTable) ((((JScrollPane) vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
+        JTable tbl = (JTable) ((((JScrollPane) vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
         int selRow = tbl.getSelectedRow();
         if (selRow != -1 && tbl.getValueAt(selRow, 0) != null) {
-        	database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+            database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
             ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
@@ -475,7 +460,7 @@ public class VirtualTaskmaster {
      * Sends data from this row to tblFavourites, sets flag favorites in database
      */
     void VTasksManagerFavouritesButton(){
-    	if((JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0])) == vTM.tblHistory){
+        if((JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0])) == vTM.tblHistory){
             ((DefaultTableModel) vTM.tblFavourites.getModel()).addRow(new Object[]{null,null,null,null});
             int row = tblFindEmptyRow(vTM.tblFavourites);
             int selRow = vTM.tblHistory.getSelectedRow();
@@ -496,14 +481,14 @@ public class VirtualTaskmaster {
     /**
      * Behavior of ToList button in VTasksManager
      * Collects user input, inserting it into table and database
-     * Enables editing tasks 
+     * Enables editing tasks
      */
     void VTasksManagerToListButton(){
-    	JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
+        JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
         if (tbl == vTM.tblHistory
-        		|| vTM.textField.getText().equals("")
-        		|| ((int)vTM.spnr_hour.getValue() == 0 && (int)vTM.spnr_mint.getValue() == 0)
-        		|| vTM.textPane.getText().equals("")) return;
+                || vTM.textField.getText().equals("")
+                || ((int)vTM.spnr_hour.getValue() == 0 && (int)vTM.spnr_mint.getValue() == 0)
+                || vTM.textPane.getText().equals("")) return;
         int selRow = tbl.getSelectedRow();
         vTM.tabEdit = true;
         if(selRow == -1)
@@ -522,23 +507,23 @@ public class VirtualTaskmaster {
         vTM.tabEdit = false;
         System.out.println(vTM.textField.getText());
         if (tbl == vTM.tblFavourites) {
-        	if(database.getTaskByName((String) vTM.textField.getText()) == null){
-        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
-        	}              
+            if(database.getTaskByName((String) vTM.textField.getText()) == null){
+                database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), true, false));
+            }
         } else {
-        	if(database.getTaskByName((String) vTM.textField.getText()) == null){
-        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, true));
-        	}
+            if(database.getTaskByName((String) vTM.textField.getText()) == null){
+                database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), false, true));
+            }
         }
     }
-    
+
     /**
      * Behavior of FromList button in VTasksManager
      * Collects data, inserting it into user input fields, from where task can be run
-     * Enables editing tasks 
+     * Enables editing tasks
      */
     void VTasksManagerFromListButton(){
-    	JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
+        JTable tbl = (JTable)((((JScrollPane)vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
         int selRow = tbl.getSelectedRow();
         vTM.tabEdit = true;
         if(selRow != -1){
@@ -559,41 +544,44 @@ public class VirtualTaskmaster {
     /**
      * Behavior of Stop Button in TaskControlWindow
      * Ends execution of task, erases data, finishes task in database
-     * @param winIndx - number of handler in table
+     * @param winIndx number of handler in table
      */
     void VTaskControlWindowStopButton(int winIndx){
-    	state[winIndx] = VTCState.vtcwFinished; vtcwTab[winIndx].active = false; vtcwTab[winIndx].setVisible(false);
+        state[winIndx] = VTCState.vtcwFinished; vtcwTab[winIndx].active = false; vtcwTab[winIndx].setVisible(false);
         elapsedTime[winIndx] = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
         for(int j = 0; j < tasks.size(); j++){
             System.out.println(tasks.get(j).getTaskName() + vtcwTab[winIndx].lblVTaskName.getText());
-        	if(tasks.get(j).getId() == (vtcwTab[winIndx].getTaskId()) && !(tasks.get(j).isDone())){
-        		database.finishTask(tasks.get(j), System.currentTimeMillis());
-        		//break;
-        	}
+            if(tasks.get(j).getId() == (vtcwTab[winIndx].getTaskId()) && !(tasks.get(j).isDone())){
+                database.finishTask(tasks.get(j), System.currentTimeMillis());
+                break;
+            }
         }
-        vtcwTab[winIndx] = new VTaskControlWindow("empty slot", "00", "00");
+        vtcwTab[winIndx].lblVTaskName.setText("empty handler");
+        vtcwTab[winIndx].lblVTimeHours.setText("00");
+        vtcwTab[winIndx].lblVTimeMinutes.setText("00");
         vTMW.vtcwLblTab[winIndx].setText("Empty slot");
+        accumulatedTime[winIndx] = 0;
     }
     /**
      * Behavior of PlayButton in TaskControlWindow
-     * If task was paused - restarts
-     * @param winIndx - index of window in table
+     * If task was paused restarts
+     * @param winIndx index of window in table
      */
     void VTaskControlWindowPlayButton(int winIndx){
-    	state[winIndx] = VTCState.vtcwStarted;
+        state[winIndx] = VTCState.vtcwStarted;
         currTime[winIndx] = System.currentTimeMillis();
         startTime[winIndx] = currTime[winIndx];
-        System.out.println(System.getProperty("user.dir"));
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
     }
     /**
      * Behavior of PauseButton in TaskControlWindow
-     * If task was run - pauses
-     * @param winIndx - index of window in table
+     * If task was run pauses
+     * @param winIndx index of window in table
      */
     void VTaskControlWindowPauseButton(int winIndx){
-    	state[winIndx] = VTCState.vtcwPaused;
+        accumulatedTime[winIndx] += currTime[winIndx] - startTime[winIndx];
+        state[winIndx] = VTCState.vtcwPaused;
         elapsedTime[winIndx] = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
     }
@@ -601,26 +589,26 @@ public class VirtualTaskmaster {
      * Each minute updates every TaskControlWindow view and its representation in database
      */
     void timerAction(){
-    	for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             if (state[i] == VTaskControlWindow.VTCState.vtcwStarted) {
                 vtcwTab[i].lblVTimeMinutes.setText(countDownTime(i, false));
                 vtcwTab[i].lblVTimeHours.setText(countDownTime(i, true));
-                
+
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
-                	if(tasks.get(j).getId() == (vtcwTab[i].getTaskId()) && !(tasks.get(j).isDone())){
-                		database.updateExecutedTask(tasks.get(j));
-                	}
+                    if(tasks.get(j).getId() == (vtcwTab[i].getTaskId()) && !(tasks.get(j).isDone())){
+                        ExecutedTask executedTask = tasks.get(j);
+                        executedTask.setElapsedTime(accumulatedTime[i] + currTime[i] - startTime[i]);
+                        database.updateExecutedTask(tasks.get(j));
+                    }
                 }
             }
         }
     }
-    
 
     /**
      * VTaskmaster auxiliary functions
      */
-
     /**
      * Searches for empty handler in main window
      *
@@ -634,16 +622,15 @@ public class VirtualTaskmaster {
         }
         return -1;
     }
-
     /**
      * Applies data from manager to found empty handler,
      * and displays user progress on the widget.
      *
      * @brief handles created tasks
-     * @param h - user-chosen estimated time (hours)
-     * @param min - user-chosen estimated time (minutes)
-     * @param task - user-typed task description
-     * @param prior - user-chosen priority of the task
+     * @param h user-chosen estimated time (hours)
+     * @param min user-chosen estimated time (minutes)
+     * @param task user-typed task description
+     * @param prior user-chosen priority of the task
      */
     void handleVTCW(int h, int min, String task, int prior, int id){
         int handler = findEmptyHandler();
@@ -665,42 +652,38 @@ public class VirtualTaskmaster {
             JOptionPane.showMessageDialog(new JFrame(), "Probably, you need to rest...");
         }
     }
-
     /**
      * Calculates the time that going to be shown on the TaskControl widget
-     * 
-     * @param winIndx    - ControlWindow which time is going to be changed
-     * @param retHourTxt - determines with will be returned - hours or minutes
+     *
+     * @param winIndx ControlWindow which time is going to be changed
+     * @param retHourTxt determines with will be returned - hours or minutes
      * @return properly formatted String
      */
     String countDownTime(int winIndx, boolean retHourTxt) { //FIXME (time) sometimes shit happens
         currTime[winIndx] = System.currentTimeMillis();
         long time = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         int timeH = (int) (time/3600000);
-        int timeM = (int) ((time - timeH*3600000)/60000);
-
+        int timeM = (int)((time - timeH*3600000+ 57000)/60000 );
         if(timeM == 0 && timeH == 0){
             vtcwTab[winIndx].lblVTimeHours.setForeground(Color.RED);
             vtcwTab[winIndx].lblVTimeMinutes.setForeground(Color.RED);
         }
-        
-        if (timeM == 15 && timeH == 0 && retHourTxt) {
-        	vtcwTab[winIndx].setVisible(true);
-        	JOptionPane.showMessageDialog(new JFrame(), "15 minutes time to the end of the task:" + vtcwTab[winIndx].lblVTaskName.getText());
-        }
 
+        if (time < 900000 && time > 897000 && retHourTxt) {
+            vtcwTab[winIndx].setVisible(true);
+            JOptionPane.showMessageDialog(new JFrame(), "15 minutes time to the end of the task:" + vtcwTab[winIndx].lblVTaskName.getText());
+        }
         if(retHourTxt){
             return VTMainWindow.timeFiller(Math.abs(timeH));
         }else{
             return VTMainWindow.timeFiller(Math.abs(timeM));
         }
     }
-
     /**
      * Counts the time in milliseconds from the human-friendly representation
-     * 
-     * @param hours   - hours that remains
-     * @param minutes - minutes that remains
+     *
+     * @param hours hours that remains
+     * @param minutes minutes that remains
      * @return elapsed time
      */
     int elapsedTimeCalc(String hours, String minutes) {
@@ -710,11 +693,11 @@ public class VirtualTaskmaster {
     }
     /**
      * Short function that checks whether data is valid
-     * 
-     * @param h - time in hours to the end of the task (+min - nonzero)
-     * @param min - time in minutes to the end of the task (+ h nonzero)
-     * @param name - can't be equal to the empty string
-     * @param desc - can't be equal to the empty string
+     *
+     * @param h time in hours to the end of the task (+min - nonzero)
+     * @param min time in minutes to the end of the task (+ h nonzero)
+     * @param name can't be equal to the empty string
+     * @param desc can't be equal to the empty string
      * @return
      */
     boolean validateDataVTM(int h, int min, String name, String desc){
@@ -725,22 +708,22 @@ public class VirtualTaskmaster {
      * (from long representing milliseconds of time to the end of the task
      * to the proper, user friendly format.
      * Then it fills every column with proper data - name, prior, and time
-     * 
-     * @param tbl - JTable that needs to be filled with data
-     * @param tasks - ArrayList of data witch which table is needed to be filled
+     *
+     * @param tbl JTable that needs to be filled with data
+     * @param tasks ArrayList of data witch which table is needed to be filled
      */
-	void fillTable(JTable tbl, ArrayList<Task> tasks){
-		for(int i=0; i<tasks.size(); i++){
-			Task task = tasks.get(i);
+    void fillTable(JTable tbl, ArrayList<Task> tasks){
+        for(int i=0; i<tasks.size(); i++){
+            Task task = tasks.get(i);
             try {
 
-			    long time = task.getExpectedTime();
-			    int timeH = (int)time/3600000; String th;
-			    int timeM = (int)((time-timeH*3600000)/60000); String tm;
-			    if(timeH < 10) th = 0+""+timeH;
-			    else th = ""+timeH;
-			    if(timeM < 10) tm = 0+""+timeM;
-			    else tm = ""+timeM;
+                long time = task.getExpectedTime();
+                int timeH = (int)time/3600000; String th;
+                int timeM = (int)((time-timeH*3600000)/60000); String tm;
+                if(timeH < 10) th = 0+""+timeH;
+                else th = ""+timeH;
+                if(timeM < 10) tm = 0+""+timeM;
+                else tm = ""+timeM;
 
                 long averageTime = database.stats.averageTimeForTaskWithName(task.getName());
                 int avrTimeH = (int) averageTime / 3600000; String ath;
@@ -759,42 +742,42 @@ public class VirtualTaskmaster {
             } catch(SQLException exception) {
                 System.out.println("SQL Exception: " + task.getName());
             }
-			    
 
-		}
-	}
-	/**
-	 * Finds empty row in the given table
-	 * 
-	 * @param tbl - table to find empty row in
-	 * @return i - index of empty row in the given table
-	 */
-	static int tblFindEmptyRow(JTable tbl) {
-		int i = 0;
-		while(tbl.getValueAt(i,0) != null) i++;
-		return i;
-	}
-	/**
-	 * Parsing time in milliseconds from VTCW displayed timeString 
-	 * 
-	 * @param time - String representation of time to be parsed to int
-	 * @param minute - defines if method should return minutes/true or hours/false
-	 * @return int time-elem - number of minutes and hours
-	 */
-	static int getHour(String time, boolean minute) {
-		if(time.length() == 5 && minute){
-			return ((Integer.parseInt((new Character(time.charAt(3)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(4)).toString())));
-		}
-		else if(time.length() == 4 && minute){
-			return ((Integer.parseInt((new Character(time.charAt(2)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(3)).toString())));
-		}
-		else if(time.length() == 5 && !minute){
-			return ((Integer.parseInt((new Character(time.charAt(0)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(1)).toString())));
-		}
-		else if(time.length() == 4 && !minute){
-			return ((Integer.parseInt((new Character(time.charAt(0)).toString()))));
-		}
-		return 0;
-	}
+
+        }
+    }
+    /**
+     * Finds empty row in the given table
+     *
+     * @param tbl table to find empty row in
+     * @return i index of empty row in the given table
+     */
+    static int tblFindEmptyRow(JTable tbl) {
+        int i = 0;
+        while(tbl.getValueAt(i,0) != null) i++;
+        return i;
+    }
+    /**
+     * Parsing time in milliseconds from VTCW displayed timeString
+     *
+     * @param time String representation of time to be parsed to int
+     * @param minute defines if method should return minutes/true or hours/false
+     * @return int time-elem - number of minutes and hours
+     */
+    static int getHour(String time, boolean minute) {
+        if(time.length() == 5 && minute){
+            return ((Integer.parseInt((new Character(time.charAt(3)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(4)).toString())));
+        }
+        else if(time.length() == 4 && minute){
+            return ((Integer.parseInt((new Character(time.charAt(2)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(3)).toString())));
+        }
+        else if(time.length() == 5 && !minute){
+            return ((Integer.parseInt((new Character(time.charAt(0)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(1)).toString())));
+        }
+        else if(time.length() == 4 && !minute){
+            return ((Integer.parseInt((new Character(time.charAt(0)).toString()))));
+        }
+        return 0;
+    }
 }
 
