@@ -402,7 +402,7 @@ public class VirtualTaskmaster {
         if(vTM.rS == returnState.VTM_RUN){
             if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
                 if(database.getTaskByName(vTM.textField.getText()) == null){
-                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
+                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, false));
                 }
                 int id = database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());
                 handleVTCW((int)vTM.spnr_hour.getValue(),
@@ -557,7 +557,7 @@ public class VirtualTaskmaster {
             }
         } else {
             if(database.getTaskByName((String) vTM.textField.getText()) == null){
-                database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), false, true));
+                database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), false, false));
             }
         }
     }
