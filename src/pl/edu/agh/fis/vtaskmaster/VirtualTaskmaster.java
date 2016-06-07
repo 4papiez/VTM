@@ -440,10 +440,10 @@ public class VirtualTaskmaster {
                 database.removeTaskByName(vTM.textField.getText());
                 why.setTodo(true);
                 database.saveTask(why);
-                VTMainWindowManageTasksButton()
+                VTMainWindowManageTasksButton();
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
-                VTMainWindowManageTasksButton()
+                VTMainWindowManageTasksButton();
             }
         }
     }
