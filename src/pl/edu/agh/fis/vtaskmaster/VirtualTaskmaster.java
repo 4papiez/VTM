@@ -35,7 +35,6 @@ public class VirtualTaskmaster {
     private long[] currTime;
     private long[] startTime;
     private long[] elapsedTime;
-    private long[] accumulatedTime;
     private int[] id;
     private Timer tmrMin;
     String sep;
@@ -75,7 +74,6 @@ public class VirtualTaskmaster {
         currTime = new long[5];
         elapsedTime = new long[5];
         startTime = new long[5];
-        accumulatedTime = new long[5];
         id = new int[5];
         state = new VTaskControlWindow.VTCState[5];
         sep = System.getProperty("file.separator");
@@ -234,7 +232,7 @@ public class VirtualTaskmaster {
         /**
          * VTaskControlWindow event handlers
          */
-        tmrMin = new Timer(3000, new ActionListener() {
+        tmrMin = new Timer(60000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 timerAction();
@@ -365,6 +363,7 @@ public class VirtualTaskmaster {
         if (selRow != -1 && vTMW.tblToDo.getValueAt(selRow, 0) != null) {
         	Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             task.setTodo(false);
+            database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             database.saveTask(task);
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         } else {
@@ -384,6 +383,11 @@ public class VirtualTaskmaster {
             int id = database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
             handleVTCW(h, min, (String) vTMW.tblToDo.getValueAt(selRow, 0), (int) vTMW.tblToDo.getValueAt(selRow, 1), id);
             System.out.println("name: " + (String) vTMW.tblToDo.getValueAt(selRow, 0));
+            Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+            task.setTodo(false);
+            database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+            database.saveTask(task);
+            ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         }
     }
@@ -442,10 +446,8 @@ public class VirtualTaskmaster {
                 database.removeTaskByName(vTM.textField.getText());
                 why.setTodo(true);
                 database.saveTask(why);
-                VTMainWindowManageTasksButton();
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
-                VTMainWindowManageTasksButton();
             }
         }
     }
@@ -521,11 +523,11 @@ public class VirtualTaskmaster {
         System.out.println(vTM.textField.getText());
         if (tbl == vTM.tblFavourites) {
         	if(database.getTaskByName((String) vTM.textField.getText()) == null){
-        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), true, false));
+        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
         	}              
         } else {
         	if(database.getTaskByName((String) vTM.textField.getText()) == null){
-        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), false, true));
+        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, true));
         	}
         }
     }
@@ -557,7 +559,7 @@ public class VirtualTaskmaster {
     /**
      * Behavior of Stop Button in TaskControlWindow
      * Ends execution of task, erases data, finishes task in database
-     * @param winIndx number of handler in table
+     * @param winIndx - number of handler in table
      */
     void VTaskControlWindowStopButton(int winIndx){
     	state[winIndx] = VTCState.vtcwFinished; vtcwTab[winIndx].active = false; vtcwTab[winIndx].setVisible(false);
@@ -567,33 +569,30 @@ public class VirtualTaskmaster {
             System.out.println(tasks.get(j).getTaskName() + vtcwTab[winIndx].lblVTaskName.getText());
         	if(tasks.get(j).getId() == (vtcwTab[winIndx].getTaskId()) && !(tasks.get(j).isDone())){
         		database.finishTask(tasks.get(j), System.currentTimeMillis());
-        		break;
+        		//break;
         	}
         }
-        vtcwTab[winIndx].lblVTaskName.setText("empty handler");
-        vtcwTab[winIndx].lblVTimeHours.setText("00");
-        vtcwTab[winIndx].lblVTimeMinutes.setText("00");
+        vtcwTab[winIndx] = new VTaskControlWindow("empty slot", "00", "00");
         vTMW.vtcwLblTab[winIndx].setText("Empty slot");
-        accumulatedTime[winIndx] = 0;
     }
     /**
      * Behavior of PlayButton in TaskControlWindow
-     * If task was paused restarts
-     * @param winIndx index of window in table
+     * If task was paused - restarts
+     * @param winIndx - index of window in table
      */
     void VTaskControlWindowPlayButton(int winIndx){
     	state[winIndx] = VTCState.vtcwStarted;
         currTime[winIndx] = System.currentTimeMillis();
         startTime[winIndx] = currTime[winIndx];
+        System.out.println(System.getProperty("user.dir"));
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lighton.png"));
     }
     /**
      * Behavior of PauseButton in TaskControlWindow
-     * If task was run pauses
-     * @param winIndx index of window in table
+     * If task was run - pauses
+     * @param winIndx - index of window in table
      */
     void VTaskControlWindowPauseButton(int winIndx){
-        accumulatedTime[winIndx] += currTime[winIndx] - startTime[winIndx];
     	state[winIndx] = VTCState.vtcwPaused;
         elapsedTime[winIndx] = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         vtcwTab[winIndx].lblInProgress.setIcon(new ImageIcon(System.getProperty("user.dir")+sep+"src"+sep+"pl"+sep+"edu"+sep+"agh"+sep+"fis"+sep+"vtaskmaster"+sep+"lightoff.png"));
@@ -610,9 +609,7 @@ public class VirtualTaskmaster {
                 ArrayList<ExecutedTask> tasks = database.getAllExecutedTasks();
                 for(int j = 0; j < tasks.size(); j++){
                 	if(tasks.get(j).getId() == (vtcwTab[i].getTaskId()) && !(tasks.get(j).isDone())){
-                        ExecutedTask executedTask = tasks.get(j);
-                        executedTask.setElapsedTime(accumulatedTime[i] + currTime[i] - startTime[i]);
-                        database.updateExecutedTask(tasks.get(j));
+                		database.updateExecutedTask(tasks.get(j));
                 	}
                 }
             }
@@ -631,8 +628,9 @@ public class VirtualTaskmaster {
      */
     private int findEmptyHandler() {
         for (int i = 0; i < 5; i++) {
-            if (!vtcwTab[i].active)
+            if (!vtcwTab[i].active) {
                 return i;
+            }
         }
         return -1;
     }
@@ -642,10 +640,10 @@ public class VirtualTaskmaster {
      * and displays user progress on the widget.
      *
      * @brief handles created tasks
-     * @param h user-chosen estimated time (hours)
-     * @param min user-chosen estimated time (minutes)
-     * @param task user-typed task description
-     * @param prior user-chosen priority of the task
+     * @param h - user-chosen estimated time (hours)
+     * @param min - user-chosen estimated time (minutes)
+     * @param task - user-typed task description
+     * @param prior - user-chosen priority of the task
      */
     void handleVTCW(int h, int min, String task, int prior, int id){
         int handler = findEmptyHandler();
@@ -671,22 +669,22 @@ public class VirtualTaskmaster {
     /**
      * Calculates the time that going to be shown on the TaskControl widget
      * 
-     * @param winIndx ControlWindow which time is going to be changed
-     * @param retHourTxt determines with will be returned - hours or minutes
+     * @param winIndx    - ControlWindow which time is going to be changed
+     * @param retHourTxt - determines with will be returned - hours or minutes
      * @return properly formatted String
      */
     String countDownTime(int winIndx, boolean retHourTxt) { //FIXME (time) sometimes shit happens
         currTime[winIndx] = System.currentTimeMillis();
         long time = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         int timeH = (int) (time/3600000);
-        int timeM = (int)((time - timeH*3600000+ 57000)/60000 );
+        int timeM = (int) ((time - timeH*3600000)/60000);
 
         if(timeM == 0 && timeH == 0){
             vtcwTab[winIndx].lblVTimeHours.setForeground(Color.RED);
             vtcwTab[winIndx].lblVTimeMinutes.setForeground(Color.RED);
         }
         
-        if (time < 900000 && time > 897000 && retHourTxt) {
+        if (timeM == 15 && timeH == 0 && retHourTxt) {
         	vtcwTab[winIndx].setVisible(true);
         	JOptionPane.showMessageDialog(new JFrame(), "15 minutes time to the end of the task:" + vtcwTab[winIndx].lblVTaskName.getText());
         }
@@ -701,8 +699,8 @@ public class VirtualTaskmaster {
     /**
      * Counts the time in milliseconds from the human-friendly representation
      * 
-     * @param hours hours that remains
-     * @param minutes minutes that remains
+     * @param hours   - hours that remains
+     * @param minutes - minutes that remains
      * @return elapsed time
      */
     int elapsedTimeCalc(String hours, String minutes) {
@@ -713,10 +711,10 @@ public class VirtualTaskmaster {
     /**
      * Short function that checks whether data is valid
      * 
-     * @param h time in hours to the end of the task (+min - nonzero)
-     * @param min time in minutes to the end of the task (+ h nonzero)
-     * @param name can't be equal to the empty string
-     * @param desc can't be equal to the empty string
+     * @param h - time in hours to the end of the task (+min - nonzero)
+     * @param min - time in minutes to the end of the task (+ h nonzero)
+     * @param name - can't be equal to the empty string
+     * @param desc - can't be equal to the empty string
      * @return
      */
     boolean validateDataVTM(int h, int min, String name, String desc){
@@ -728,12 +726,14 @@ public class VirtualTaskmaster {
      * to the proper, user friendly format.
      * Then it fills every column with proper data - name, prior, and time
      * 
-     * @param tbl JTable that needs to be filled with data
-     * @param tasks ArrayList of data witch which table is needed to be filled
+     * @param tbl - JTable that needs to be filled with data
+     * @param tasks - ArrayList of data witch which table is needed to be filled
      */
 	void fillTable(JTable tbl, ArrayList<Task> tasks){
 		for(int i=0; i<tasks.size(); i++){
 			Task task = tasks.get(i);
+            try {
+
 			    long time = task.getExpectedTime();
 			    int timeH = (int)time/3600000; String th;
 			    int timeM = (int)((time-timeH*3600000)/60000); String tm;
@@ -741,19 +741,33 @@ public class VirtualTaskmaster {
 			    else th = ""+timeH;
 			    if(timeM < 10) tm = 0+""+timeM;
 			    else tm = ""+timeM;
+
+                long averageTime = database.stats.averageTimeForTaskWithName(task.getName());
+                int avrTimeH = (int) averageTime / 3600000; String ath;
+                int avrTimeM = (int) ((averageTime - avrTimeH * 3600000) / 60000); String atm;
+                if (avrTimeH < 10) ath = 0 + "" + avrTimeH;
+                else ath = "" + avrTimeH;
+                if (avrTimeM < 10) atm = 0 + "" + avrTimeM;
+                else atm = "" + avrTimeM;
+
+                ((DefaultTableModel) tbl.getModel()).addRow(new Object[]{null,null,null,null});
+                tbl.setValueAt(task.getName(), i, 0);
+                tbl.setValueAt(task.getPriority(), i, 1);
+                tbl.setValueAt(th+":"+tm, i, 2);
+                tbl.setValueAt(ath+":"+atm, i, 3);
+
+            } catch(SQLException exception) {
+                System.out.println("SQL Exception: " + task.getName());
+            }
 			    
-				((DefaultTableModel) tbl.getModel()).addRow(new Object[]{null,null,null,null});
-				tbl.setValueAt(task.getName(), i, 0);
-				tbl.setValueAt(task.getPriority(), i, 1);
-				tbl.setValueAt(th+":"+tm, i, 2);
-				tbl.setValueAt(th+":"+tm, i, 3);
+
 		}
 	}
 	/**
 	 * Finds empty row in the given table
 	 * 
-	 * @param tbl table to find empty row in
-	 * @return i index of empty row in the given table
+	 * @param tbl - table to find empty row in
+	 * @return i - index of empty row in the given table
 	 */
 	static int tblFindEmptyRow(JTable tbl) {
 		int i = 0;
@@ -763,8 +777,8 @@ public class VirtualTaskmaster {
 	/**
 	 * Parsing time in milliseconds from VTCW displayed timeString 
 	 * 
-	 * @param time String representation of time to be parsed to int
-	 * @param minute defines if method should return minutes/true or hours/false
+	 * @param time - String representation of time to be parsed to int
+	 * @param minute - defines if method should return minutes/true or hours/false
 	 * @return int time-elem - number of minutes and hours
 	 */
 	static int getHour(String time, boolean minute) {
