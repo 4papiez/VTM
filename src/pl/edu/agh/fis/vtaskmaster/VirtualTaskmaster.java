@@ -380,7 +380,8 @@ public class VirtualTaskmaster {
             int min = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), true);
             Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             task.setTodo(false);
-           // database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+            // tego ma nie byc, sprawdzalem, ze dziala poprawnie zwyczajne saveTask ~Grzesiek
+            //database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             database.saveTask(task);
             int row = tblFindEmptyRow(vTM.tblHistory);
             if(vTM.tblHistory.getValueAt(row, 0) == null){
