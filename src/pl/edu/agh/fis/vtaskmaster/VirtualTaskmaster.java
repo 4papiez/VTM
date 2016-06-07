@@ -369,13 +369,21 @@ public class VirtualTaskmaster {
         if (selRow != -1) {
             int h = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), false);
             int min = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), true);
-            int id = database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
-            handleVTCW(h, min, (String) vTMW.tblToDo.getValueAt(selRow, 0), (int) vTMW.tblToDo.getValueAt(selRow, 1), id);
-            System.out.println("name: " + (String) vTMW.tblToDo.getValueAt(selRow, 0));
             Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             task.setTodo(false);
             database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             database.saveTask(task);
+            int row = tblFindEmptyRow(vTM.tblHistory);
+            if(vTM.tblHistory.getValueAt(row, 0) == null){
+                ((DefaultTableModel) vTM.tblHistory.getModel()).addRow(new Object[]{null,null,null,null});
+            }
+            vTM.tblHistory.setValueAt(vTMW.tblToDo.getValueAt(selRow, 0),row,0);
+            vTM.tblHistory.setValueAt(vTMW.tblToDo.getValueAt(selRow, 1),row,1);
+            vTM.tblHistory.setValueAt(vTMW.tblToDo.getValueAt(selRow, 2),row,2);
+            vTM.tblHistory.setValueAt(vTMW.tblToDo.getValueAt(selRow, 3),row,3);
+            int id = database.executeTask(database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0)), System.currentTimeMillis());
+            handleVTCW(h, min, (String) vTMW.tblToDo.getValueAt(selRow, 0), (int) vTMW.tblToDo.getValueAt(selRow, 1), id);
+            System.out.println("name: " + (String) vTMW.tblToDo.getValueAt(selRow, 0));
             ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         }
     }
