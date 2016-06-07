@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -144,19 +145,19 @@ public class VirtualTaskmaster {
             public void mouseClicked(MouseEvent e) {
                 try {
                     vTS.lblEffectivenessV.setText(
-                            String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.ALL))
+                            new DecimalFormat("#.##").format(database.stats.efficiency(CoreStats.TasksFilter.ALL))
                     );
                     vTS.lblEffectivenessFavV.setText(
-                            String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.FAVOURITES))
+                            new DecimalFormat("#.##").format(database.stats.efficiency(CoreStats.TasksFilter.FAVOURITES))
                     );
                     vTS.lblEffectivenessNFavV.setText(
-                            String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.NON_FAVOURITES))
+                            new DecimalFormat("#.##").format(database.stats.efficiency(CoreStats.TasksFilter.NON_FAVOURITES))
                     );
                     vTS.lblOnTimeV.setText(
-                            String.valueOf(database.stats.onTime())
+                            new DecimalFormat("#.#").format(database.stats.onTime()) + "%"
                     );
                     vTS.lblDifferenceV.setText(
-                            String.valueOf(database.stats.averageDifference(true))
+                            String.valueOf(database.stats.averageDifference(true) / 60000) + " min"
                     );
                     vTS.lblDifferenceProcV.setText(
                             String.valueOf(database.stats.averageDifference(false)) + "%"
@@ -165,7 +166,7 @@ public class VirtualTaskmaster {
                             String.valueOf(database.stats.numberOfDoneTasks())
                     );
                     vTS.lblTimeCountV.setText(
-                            String.valueOf(database.stats.timeSpentWorking())
+                            String.valueOf(database.stats.timeSpentWorking() / 60000) + " min"
                     );
                     vTS.lblAvgPriorV.setText(
                             String.valueOf(database.stats.averagePriority())
@@ -379,7 +380,7 @@ public class VirtualTaskmaster {
             int min = getHour((String) vTMW.tblToDo.getValueAt(selRow, 2), true);
             Task task = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             task.setTodo(false);
-            database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+           // database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
             database.saveTask(task);
             int row = tblFindEmptyRow(vTM.tblHistory);
             if(vTM.tblHistory.getValueAt(row, 0) == null){
