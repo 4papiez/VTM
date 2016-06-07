@@ -410,6 +410,19 @@ public class VirtualTaskmaster {
                 else{
                     vTM.tblHistory.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),row,2);
                 }
+                try {
+                    long averageTime = database.stats.averageTimeForTaskWithName(vTM.textField.getText());
+                    int avrTimeH = (int) averageTime / 3600000; String ath;
+                    int avrTimeM = (int) ((averageTime - avrTimeH * 3600000) / 60000); String atm;
+                    if (avrTimeH < 10) ath = 0 + "" + avrTimeH;
+                    else ath = "" + avrTimeH;
+                    if (avrTimeM < 10) atm = 0 + "" + avrTimeM;
+                    else atm = "" + avrTimeM;
+
+                    vTM.tblHistory.setValueAt(ath + ":" + atm, row, 3);
+                } catch(SQLException exception) {
+                    System.out.println("SQL Exception: " + vTM.textField.getText());
+                }
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
             }
@@ -423,7 +436,7 @@ public class VirtualTaskmaster {
                 vTMW.tblToDo.setValueAt(VTMainWindow.timeFiller((int)vTM.spnr_hour.getValue())+":"+ VTMainWindow.timeFiller((int)vTM.spnr_mint.getValue()), eRow, 2);
                 vTMW.tblToDo.setValueAt("00:00", eRow, 3);
                 if(database.getTaskByName(vTM.textField.getText()) == null){
-                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
+                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), true, false));
                 }
                 Task why = database.getTaskByName(vTM.textField.getText());
                 database.removeTaskByName(vTM.textField.getText());
@@ -503,6 +516,19 @@ public class VirtualTaskmaster {
         }
         else{
             tbl.setValueAt(vTM.spnr_hour.getValue()+":0"+vTM.spnr_mint.getValue(),selRow,2);
+        }
+        try {
+            long averageTime = database.stats.averageTimeForTaskWithName(vTM.textField.getText());
+            int avrTimeH = (int) averageTime / 3600000; String ath;
+            int avrTimeM = (int) ((averageTime - avrTimeH * 3600000) / 60000); String atm;
+            if (avrTimeH < 10) ath = 0 + "" + avrTimeH;
+            else ath = "" + avrTimeH;
+            if (avrTimeM < 10) atm = 0 + "" + avrTimeM;
+            else atm = "" + avrTimeM;
+
+            tbl.setValueAt(ath + ":" + atm, selRow, 3);
+        } catch(SQLException exception) {
+            tbl.setValueAt("0:00", selRow, 3);
         }
         vTM.tabEdit = false;
         System.out.println(vTM.textField.getText());
