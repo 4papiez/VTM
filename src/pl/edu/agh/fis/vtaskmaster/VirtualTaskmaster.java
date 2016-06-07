@@ -440,8 +440,10 @@ public class VirtualTaskmaster {
                 database.removeTaskByName(vTM.textField.getText());
                 why.setTodo(true);
                 database.saveTask(why);
+                VTMainWindowManageTasksButton()
             }else{
                 JOptionPane.showMessageDialog(new JFrame(), "You have to provide full description of your task.");
+                VTMainWindowManageTasksButton()
             }
         }
     }
@@ -517,11 +519,11 @@ public class VirtualTaskmaster {
         System.out.println(vTM.textField.getText());
         if (tbl == vTM.tblFavourites) {
         	if(database.getTaskByName((String) vTM.textField.getText()) == null){
-        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), true, false));
+        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), true, false));
         	}              
         } else {
         	if(database.getTaskByName((String) vTM.textField.getText()) == null){
-        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, true));
+        		database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), false, true));
         	}
         }
     }
