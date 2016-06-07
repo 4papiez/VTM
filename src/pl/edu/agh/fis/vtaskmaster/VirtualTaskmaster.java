@@ -570,7 +570,9 @@ public class VirtualTaskmaster {
         		break;
         	}
         }
-        vtcwTab[winIndx] = new VTaskControlWindow("empty slot", "00", "00");
+        vtcwTab[winIndx].lblVTaskName.setText("empty handler");
+        vtcwTab[winIndx].lblVTimeHours.setText("00");
+        vtcwTab[winIndx].lblVTimeMinutes.setText("00");
         vTMW.vtcwLblTab[winIndx].setText("Empty slot");
         accumulatedTime[winIndx] = 0;
     }
