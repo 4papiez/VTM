@@ -142,7 +142,6 @@ public class VirtualTaskmaster {
         vTMW.btnStats.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //TODO replace "0" with proper getter converted to String
                 try {
                     vTS.lblEffectivenessV.setText(
                             String.valueOf(database.stats.efficiency(CoreStats.TasksFilter.ALL))
@@ -411,7 +410,9 @@ public class VirtualTaskmaster {
         if(vTM.rS == returnState.VTM_RUN){
             if(validateDataVTM((int)vTM.spnr_hour.getValue(),(int)vTM.spnr_mint.getValue(),vTM.textField.getText(), vTM.textPane.getText())){
                 if(database.getTaskByName(vTM.textField.getText()) == null){
-                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, false));
+                    // chyba zle liczony czas
+                    //database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) (((Integer)vTM.spnr_hour.getValue() + (Integer)vTM.spnr_mint.getValue() * 60) * 6000), false, false));
+                    database.saveTask(new Task(vTM.textField.getText(), vTM.textPane.getText(), (int)vTM.spnr_prior.getValue(), (long) ((Integer)vTM.spnr_hour.getValue()*3600000 + (Integer)vTM.spnr_mint.getValue()*60000), true, false));
                 }
                 int id = database.executeTask(database.getTaskByName(vTM.textField.getText()), System.currentTimeMillis());
                 handleVTCW((int)vTM.spnr_hour.getValue(),
