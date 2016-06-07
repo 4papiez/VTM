@@ -232,7 +232,7 @@ public class VirtualTaskmaster {
         /**
          * VTaskControlWindow event handlers
          */
-        tmrMin = new Timer(60000, new ActionListener() {
+        tmrMin = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 timerAction();
@@ -555,7 +555,7 @@ public class VirtualTaskmaster {
     /**
      * Behavior of Stop Button in TaskControlWindow
      * Ends execution of task, erases data, finishes task in database
-     * @param winIndx - number of handler in table
+     * @param winIndx number of handler in table
      */
     void VTaskControlWindowStopButton(int winIndx){
     	state[winIndx] = VTCState.vtcwFinished; vtcwTab[winIndx].active = false; vtcwTab[winIndx].setVisible(false);
@@ -573,8 +573,8 @@ public class VirtualTaskmaster {
     }
     /**
      * Behavior of PlayButton in TaskControlWindow
-     * If task was paused - restarts
-     * @param winIndx - index of window in table
+     * If task was paused restarts
+     * @param winIndx index of window in table
      */
     void VTaskControlWindowPlayButton(int winIndx){
     	state[winIndx] = VTCState.vtcwStarted;
@@ -585,8 +585,8 @@ public class VirtualTaskmaster {
     }
     /**
      * Behavior of PauseButton in TaskControlWindow
-     * If task was run - pauses
-     * @param winIndx - index of window in table
+     * If task was run pauses
+     * @param winIndx index of window in table
      */
     void VTaskControlWindowPauseButton(int winIndx){
     	state[winIndx] = VTCState.vtcwPaused;
@@ -635,10 +635,10 @@ public class VirtualTaskmaster {
      * and displays user progress on the widget.
      *
      * @brief handles created tasks
-     * @param h - user-chosen estimated time (hours)
-     * @param min - user-chosen estimated time (minutes)
-     * @param task - user-typed task description
-     * @param prior - user-chosen priority of the task
+     * @param h user-chosen estimated time (hours)
+     * @param min user-chosen estimated time (minutes)
+     * @param task user-typed task description
+     * @param prior user-chosen priority of the task
      */
     void handleVTCW(int h, int min, String task, int prior, int id){
         int handler = findEmptyHandler();
@@ -664,22 +664,22 @@ public class VirtualTaskmaster {
     /**
      * Calculates the time that going to be shown on the TaskControl widget
      * 
-     * @param winIndx    - ControlWindow which time is going to be changed
-     * @param retHourTxt - determines with will be returned - hours or minutes
+     * @param winIndx ControlWindow which time is going to be changed
+     * @param retHourTxt determines with will be returned - hours or minutes
      * @return properly formatted String
      */
     String countDownTime(int winIndx, boolean retHourTxt) { //FIXME (time) sometimes shit happens
         currTime[winIndx] = System.currentTimeMillis();
         long time = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         int timeH = (int) (time/3600000);
-        int timeM = (int) ((time - timeH*3600000)/60000);
+        int timeM = (int)((time - timeH*3600000+ 57000)/60000 );
 
         if(timeM == 0 && timeH == 0){
             vtcwTab[winIndx].lblVTimeHours.setForeground(Color.RED);
             vtcwTab[winIndx].lblVTimeMinutes.setForeground(Color.RED);
         }
         
-        if (timeM == 15 && timeH == 0 && retHourTxt) {
+        if (time < 900000 && time > 897000 && retHourTxt) {
         	vtcwTab[winIndx].setVisible(true);
         	JOptionPane.showMessageDialog(new JFrame(), "15 minutes time to the end of the task:" + vtcwTab[winIndx].lblVTaskName.getText());
         }
@@ -694,8 +694,8 @@ public class VirtualTaskmaster {
     /**
      * Counts the time in milliseconds from the human-friendly representation
      * 
-     * @param hours   - hours that remains
-     * @param minutes - minutes that remains
+     * @param hours hours that remains
+     * @param minutes minutes that remains
      * @return elapsed time
      */
     int elapsedTimeCalc(String hours, String minutes) {
@@ -706,10 +706,10 @@ public class VirtualTaskmaster {
     /**
      * Short function that checks whether data is valid
      * 
-     * @param h - time in hours to the end of the task (+min - nonzero)
-     * @param min - time in minutes to the end of the task (+ h nonzero)
-     * @param name - can't be equal to the empty string
-     * @param desc - can't be equal to the empty string
+     * @param h time in hours to the end of the task (+min - nonzero)
+     * @param min time in minutes to the end of the task (+ h nonzero)
+     * @param name can't be equal to the empty string
+     * @param desc can't be equal to the empty string
      * @return
      */
     boolean validateDataVTM(int h, int min, String name, String desc){
@@ -721,8 +721,8 @@ public class VirtualTaskmaster {
      * to the proper, user friendly format.
      * Then it fills every column with proper data - name, prior, and time
      * 
-     * @param tbl - JTable that needs to be filled with data
-     * @param tasks - ArrayList of data witch which table is needed to be filled
+     * @param tbl JTable that needs to be filled with data
+     * @param tasks ArrayList of data witch which table is needed to be filled
      */
 	void fillTable(JTable tbl, ArrayList<Task> tasks){
 		for(int i=0; i<tasks.size(); i++){
@@ -746,8 +746,8 @@ public class VirtualTaskmaster {
 	/**
 	 * Finds empty row in the given table
 	 * 
-	 * @param tbl - table to find empty row in
-	 * @return i - index of empty row in the given table
+	 * @param tbl table to find empty row in
+	 * @return i index of empty row in the given table
 	 */
 	static int tblFindEmptyRow(JTable tbl) {
 		int i = 0;
@@ -757,8 +757,8 @@ public class VirtualTaskmaster {
 	/**
 	 * Parsing time in milliseconds from VTCW displayed timeString 
 	 * 
-	 * @param time - String representation of time to be parsed to int
-	 * @param minute - defines if method should return minutes/true or hours/false
+	 * @param time String representation of time to be parsed to int
+	 * @param minute defines if method should return minutes/true or hours/false
 	 * @return int time-elem - number of minutes and hours
 	 */
 	static int getHour(String time, boolean minute) {
