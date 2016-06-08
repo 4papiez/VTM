@@ -500,27 +500,32 @@ public class VirtualTaskmaster {
         JTable tbl = (JTable) ((((JScrollPane) vTM.tabbedPane.getSelectedComponent()).getViewport().getComponents()[0]));
         int selRow = tbl.getSelectedRow();
         if (selRow != -1 && tbl.getValueAt(selRow, 0) != null) {
-            if(!database.getTaskByName((String) tbl.getValueAt(selRow, 0)).isTodo()){
-                boolean inHistory = false;
-                ArrayList<Task> history = database.getHistory();
-                for(int i=0; i < history.size(); i++){
-                    if(history.get(i).getName().equals((String) tbl.getValueAt(selRow, 0))){
-                        inHistory = true;
+            if(tbl == vTM.tblFavourites) {
+                if (!database.getTaskByName((String) tbl.getValueAt(selRow, 0)).isTodo()) {
+                    boolean inHistory = false;
+                    ArrayList<Task> history = database.getHistory();
+                    for (int i = 0; i < history.size(); i++) {
+                        if (history.get(i).getName().equals((String) tbl.getValueAt(selRow, 0))) {
+                            inHistory = true;
+                        }
                     }
-                }
-                if(!inHistory) {
-                    database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+                    if (!inHistory) {
+                        database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+                    } else {
+                        Task why = database.getTaskByName((String) tbl.getValueAt(selRow, 0));
+                        why.setFavourite(false);
+                        database.saveTask(why);
+                    }
                 } else {
                     Task why = database.getTaskByName((String) tbl.getValueAt(selRow, 0));
                     why.setFavourite(false);
                     database.saveTask(why);
                 }
+                ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
             } else {
-                Task why = database.getTaskByName((String) tbl.getValueAt(selRow, 0));
-                why.setFavourite(false);
-                database.saveTask(why);
+                database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+                ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
             }
-            ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
         }
