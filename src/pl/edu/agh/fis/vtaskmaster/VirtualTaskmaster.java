@@ -892,6 +892,20 @@ public class VirtualTaskmaster {
 
         }
     }
+
+    /**
+     * Clear table - cleaning the table before reupload
+     *
+     * @param tbl - table to be cleaned
+     */
+    static void clearTable(JTable tbl){
+        DefaultTableModel dtm = (DefaultTableModel)(tbl.getModel());
+        int count = dtm.getRowCount();
+        for(int i = 0; i < count; i++){
+            dtm.removeRow(0);
+        }
+        dtm.addRow(new Object[]{null,null,null,null});
+    }
     /**
      * Finds empty row in the given table
      *
