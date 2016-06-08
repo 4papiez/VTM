@@ -356,13 +356,20 @@ public class VirtualTaskmaster {
                 }
                 if(!inHistory) {
                     database.removeTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
+                    clearTable(vTM.tblHistory);
+                    clearTable(vTM.tblFavourites);
+                    clearTable(vTMW.tblToDo);
+                    fillTable(vTM.tblHistory, database.getHistory());
+                    fillTable(vTM.tblFavourites, database.getFavourites());
+                    fillTable(vTMW.tblToDo, database.getTodo());
                 }
             } else {
                 Task why = database.getTaskByName((String) vTMW.tblToDo.getValueAt(selRow, 0));
                 why.setTodo(false);
                 database.saveTask(why);
+                clearTable(vTM.tblFavourites);
+                fillTable(vTM.tblFavourites, database.getFavourites());
             }
-            ((DefaultTableModel) vTMW.tblToDo.getModel()).removeRow(selRow);
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
         }
@@ -511,20 +518,38 @@ public class VirtualTaskmaster {
                     }
                     if (!inHistory) {
                         database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
+                        clearTable(vTM.tblHistory);
+                        clearTable(vTM.tblFavourites);
+                        clearTable(vTMW.tblToDo);
+                        fillTable(vTM.tblHistory, database.getHistory());
+                        fillTable(vTM.tblFavourites, database.getFavourites());
+                        fillTable(vTMW.tblToDo, database.getTodo());
                     } else {
                         Task why = database.getTaskByName((String) tbl.getValueAt(selRow, 0));
                         why.setFavourite(false);
                         database.saveTask(why);
+                        clearTable(vTM.tblFavourites);
+                        clearTable(vTMW.tblToDo);
+                        fillTable(vTM.tblFavourites, database.getFavourites());
+                        fillTable(vTMW.tblToDo, database.getTodo());
                     }
                 } else {
                     Task why = database.getTaskByName((String) tbl.getValueAt(selRow, 0));
                     why.setFavourite(false);
                     database.saveTask(why);
+                    clearTable(vTM.tblFavourites);
+                    clearTable(vTMW.tblToDo);
+                    fillTable(vTM.tblFavourites, database.getFavourites());
+                    fillTable(vTMW.tblToDo, database.getTodo());
                 }
-                ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
             } else {
                 database.removeTaskByName((String) tbl.getValueAt(selRow, 0));
-                ((DefaultTableModel) tbl.getModel()).removeRow(selRow);
+                clearTable(vTM.tblHistory);
+                clearTable(vTM.tblFavourites);
+                clearTable(vTMW.tblToDo);
+                fillTable(vTM.tblHistory, database.getHistory());
+                fillTable(vTM.tblFavourites, database.getFavourites());
+                fillTable(vTMW.tblToDo, database.getTodo());
             }
         } else {
             JOptionPane.showMessageDialog(new JFrame(), "You need to select filled row.");
@@ -700,6 +725,12 @@ public class VirtualTaskmaster {
             System.out.println(tasks.get(j).getTaskName() + vtcwTab[winIndx].lblVTaskName.getText());
             if(tasks.get(j).getId() == (vtcwTab[winIndx].getTaskId()) && !(tasks.get(j).isDone())){
                 database.finishTask(tasks.get(j), System.currentTimeMillis());
+                clearTable(vTM.tblHistory);
+                clearTable(vTM.tblFavourites);
+                clearTable(vTMW.tblToDo);
+                fillTable(vTM.tblHistory, database.getHistory());
+                fillTable(vTM.tblFavourites, database.getFavourites());
+                fillTable(vTMW.tblToDo, database.getTodo());
                 break;
             }
         }
@@ -927,33 +958,16 @@ public class VirtualTaskmaster {
      * @return int time-elem - number of minutes and hours
      */
     static int getHour(String time, boolean minute) {
-        if(time.length() == 5 && minute){
-            return ((Integer.parseInt((new Character(time.charAt(3)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(4)).toString())));
-        }
-        else if(time.length() == 4 && minute){
-            return ((Integer.parseInt((new Character(time.charAt(2)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(3)).toString())));
-        }
-        else if(time.length() == 5 && !minute){
-            return ((Integer.parseInt((new Character(time.charAt(0)).toString())))* 10 + Integer.parseInt((new Character(time.charAt(1)).toString())));
-        }
-        else if(time.length() == 4 && !minute){
+        if (time.length() == 5 && minute) {
+            return ((Integer.parseInt((new Character(time.charAt(3)).toString()))) * 10 + Integer.parseInt((new Character(time.charAt(4)).toString())));
+        } else if (time.length() == 4 && minute) {
+            return ((Integer.parseInt((new Character(time.charAt(2)).toString()))) * 10 + Integer.parseInt((new Character(time.charAt(3)).toString())));
+        } else if (time.length() == 5 && !minute) {
+            return ((Integer.parseInt((new Character(time.charAt(0)).toString()))) * 10 + Integer.parseInt((new Character(time.charAt(1)).toString())));
+        } else if (time.length() == 4 && !minute) {
             return ((Integer.parseInt((new Character(time.charAt(0)).toString()))));
         }
         return 0;
-    }
-    
-    /**
-     * Clear table - cleaning the table before reupload
-     * 
-     * @param tbl - table to be cleaned
-     */
-    static void clearTable(JTable tbl){
-    	DefaultTableModel dtm = (DefaultTableModel)(tbl.getModel());
-    	int count = dtm.getRowCount();
-    	for(int i = 0; i < count; i++){
-    		dtm.removeRow(0);
-    	}
-    	dtm.addRow(new Object[]{null,null,null,null});
     }
 }
 
