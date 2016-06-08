@@ -63,11 +63,11 @@ public class VTStats extends JDialog {
 		lblOnTime.setBounds(10, 70, 200, 20);
 		contentPanel.add(lblOnTime);
 		
-		lblDifference = new JLabel("Time difference:");
+		lblDifference = new JLabel("Average time difference:");
 		lblDifference.setBounds(10, 90, 200, 20);
 		contentPanel.add(lblDifference);
 		
-		lblDifferenceProc = new JLabel("Time difference %:");
+		lblDifferenceProc = new JLabel("Average time difference %:");
 		lblDifferenceProc.setBounds(10, 110,200, 20);
 		contentPanel.add(lblDifferenceProc);
 		
