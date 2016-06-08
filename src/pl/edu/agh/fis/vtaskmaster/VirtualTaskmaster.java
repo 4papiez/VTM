@@ -871,6 +871,7 @@ public class VirtualTaskmaster {
                 if(timeM < 10) tm = 0+""+timeM;
                 else tm = ""+timeM;
 
+
                 long averageTime = database.stats.averageTimeForTaskWithName(task.getName());
                 int avrTimeH = (int) averageTime / 3600000; String ath;
                 int avrTimeM = (int) ((averageTime - avrTimeH * 3600000) / 60000); String atm;
