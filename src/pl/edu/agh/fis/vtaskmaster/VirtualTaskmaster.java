@@ -772,11 +772,11 @@ public class VirtualTaskmaster {
      * @param retHourTxt determines with will be returned - hours or minutes
      * @return properly formatted String
      */
-    String countDownTime(int winIndx, boolean retHourTxt) { //FIXME (time) sometimes shit happens
+    String countDownTime(int winIndx, boolean retHourTxt) {
         currTime[winIndx] = System.currentTimeMillis();
         long time = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         int timeH = (int) (time/3600000);
-        int timeM = (int)((time - timeH*3600000+ 57000)/60000 );
+        int timeM = (int)((time - timeH*3600000)/60000 );
         if(timeM == 0 && timeH == 0){
             vtcwTab[winIndx].lblVTimeHours.setForeground(Color.RED);
             vtcwTab[winIndx].lblVTimeMinutes.setForeground(Color.RED);
