@@ -810,10 +810,11 @@ public class VirtualTaskmaster {
         long time = elapsedTime[winIndx] - (currTime[winIndx] - startTime[winIndx]);
         int timeH = (int) (time/3600000);
         int timeM = (int)((time - timeH*3600000)/60000 );
-        if(timeM == 0 && timeH == 0){
+        if(time < 0 && time > -10000){
             vtcwTab[winIndx].lblVTimeHours.setForeground(Color.RED);
             vtcwTab[winIndx].lblVTimeMinutes.setForeground(Color.RED);
         }
+        if(time < 0) timeM++;	
 
         if (time < 900000 && time > 897000 && retHourTxt) {
             vtcwTab[winIndx].setVisible(true);
@@ -925,6 +926,20 @@ public class VirtualTaskmaster {
             return ((Integer.parseInt((new Character(time.charAt(0)).toString()))));
         }
         return 0;
+    }
+    
+    /**
+     * Clear table - cleaning the table before reupload
+     * 
+     * @param tbl - table to be cleaned
+     */
+    static void clearTable(JTable tbl){
+    	DefaultTableModel dtm = (DefaultTableModel)(tbl.getModel());
+    	int count = dtm.getRowCount();
+    	for(int i = 0; i < count; i++){
+    		dtm.removeRow(0);
+    	}
+    	dtm.addRow(new Object[]{null,null,null,null});
     }
 }
 
